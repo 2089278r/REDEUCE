@@ -1,0 +1,76 @@
+User Stories:
+
+Visitor at Exhibition:
+
+-As a visitor,
+I should be able to choose a program to run,
+So I can see the DEUCE work through different problems
+
+- As a visitor,
+I should be able to clear the state of the machine, (Clear OS key on control planel)
+So I can load a new program
+
+- As a visitor, 
+I should be able to see the output of a program on the control panel,
+In case I don't want the computer "punching cards"
+
+- As a visitor, 
+I should be able to input something to DL0 with the ID lamps,
+So that I can see the change in memory
+
+- As a visitor, 
+I should be able to clear the ID lamps with the Clear ID key,
+So I don't need to change each digit by hand if I made a mistake
+
+- As a visitor,
+I should be able to step through a program using the stop key,
+So I can see the changes in memory as it progresses
+
+- As a visitor,
+I should be able to step through a program using the one-shot dial,
+So I can control the pace of the program
+
+-As a visitor,
+I should be able to return the stop key to its "up" position,
+So the program can return to running at its intended speed.
+
+- As a visitor, 
+I should be able to switch between Delay Lines,
+So I can see what changes in different parts of memory
+
+- As a visitor,
+I should be able to clear the "alarum",
+So that I can continue running a program after a stopper has been reached
+
+- As a visitor, 
+I should NOT be able to stop or step through a program when the reader or writer are on,
+So that I can't disturb the results of a carefully made program
+
+- As a visitor,
+I should be able to use the External Tree key to have the program use my inputs,
+So I can see what happens to a program with a different ordering of instructions
+
+- 
+
+Programmer:
+
+Program should
+
+- Read through all instructions, storing them in memory
+	- Get string
+	- Split up into parts of instruction word
+- Then read in DATA
+	- Perhaps just do this by having an END?
+	- But how did reading in data work?
+		- Sources say was done in decimal...
+		- So maybe have separate DATA cards?
+ 			- Could "cheat" here, I suppose...
+- Then start executing
+	- 1)Start at DL0, word0, I suppose
+	- 2)Then, "get" NIS + time (time increments counter)
+	- 3)repeat 2)
+
+-Generally a large SWITCH statement for all arithmetic, logic, etc.
+-Otherwise, simply transferring between places in memory.
+
+
