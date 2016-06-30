@@ -6,16 +6,16 @@ public class DelayLine extends MemoryUnit{
 	
 	public DelayLine(){
 		int numberOfWords = 32;
-		contents = new String[numberOfWords];
+		contents = new Word[numberOfWords];
 		Arrays.fill(contents, "00000000000000000000000000000000");
 	}
 	
-	void write(String word){
+	void write(Word word){
 		int line = (counter % 32);
 		contents[line] = word;
 	}
 	
-	public String read(){
+	public Word read(){
 		int currentMC = (counter % 32);
 		return contents[currentMC];
 	}

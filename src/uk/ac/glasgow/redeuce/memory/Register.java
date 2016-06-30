@@ -6,11 +6,11 @@ public abstract class Register extends MemoryUnit {
 	int numberOfWords;
 	
 	public Register(){
-		contents = new String[numberOfWords];
-		Arrays.fill(contents, "000000000000000000000000000000000");
+		contents = new Word[numberOfWords];
+		Arrays.fill(contents, new Word());
 	}
 	
-	public void write(String word){
+	public void write(Word word){
 		int currentMC = (counter % 32);
 		if (currentMC < numberOfWords){
 			// Check it's data rather than an instruction maybe?
@@ -18,7 +18,7 @@ public abstract class Register extends MemoryUnit {
 		}
 	}
 	
-	public String read(){
+	public Word read(){
 		int currentMC = (counter % 32);
 		if (currentMC < numberOfWords){
 			return contents[currentMC];

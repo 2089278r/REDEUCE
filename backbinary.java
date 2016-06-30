@@ -6,12 +6,14 @@ public class backbinary{
 
 public static void main(String[] args) throws IOException{
 	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	System.out.print("Please enter a backwards binary number");
+	System.out.println("Please enter a backwards binary number: ");
 	String str = br.readLine();
-	int numb = Integer.parseInt(str);
-	int iterator = 0;
-	while (iterator < str.length()){
+	int decimalReturn = 0;
+	for (int i = 0; i < str.length(); i++){
+		int currentNumber = Integer.parseInt(str.substring(i,(i+1)));
+		decimalReturn += currentNumber*java.lang.Math.pow(2, i);
 	}
+	System.out.println(decimalReturn);
 }
 }
 		
