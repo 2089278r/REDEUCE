@@ -13,4 +13,6 @@ public class Word {
 	public Word(int[] binaryDigits){
 		this.binaryDigits = binaryDigits;
 	}
+	
+	
 }

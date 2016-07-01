@@ -1,17 +1,16 @@
 package uk.ac.glasgow.redeuce.memory;
 
-import java.util.Arrays;
-
 public class SingleRegister extends Register {
+	private static final int size = 1;
 	
 	public SingleRegister(){
-		numberOfWords = 1;
-		contents = new Word[numberOfWords];
-		Arrays.fill(contents, new Word());
+		super(size);
 	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
+	
+	//void write(Word word){
+	//	contents[(counter % size)] = word;
+	//}
+	//Word read(){
+	//	return contents[(counter % size)];
+	//}
 }

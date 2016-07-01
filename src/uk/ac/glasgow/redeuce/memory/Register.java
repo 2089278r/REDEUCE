@@ -1,28 +1,9 @@
 package uk.ac.glasgow.redeuce.memory;
 
-import java.util.Arrays;
-
-public abstract class Register extends MemoryUnit {
-	int numberOfWords;
-	
-	public Register(){
-		contents = new Word[numberOfWords];
-		Arrays.fill(contents, new Word());
+public abstract class Register extends MemoryUnit {	
+	public Register(int SIZE){
+		super(SIZE);
 	}
 	
-	public void write(Word word){
-		int currentMC = (counter % 32);
-		if (currentMC < numberOfWords){
-			// Check it's data rather than an instruction maybe?
-			contents[currentMC] = word;
-		}
-	}
 	
-	public Word read(){
-		int currentMC = (counter % 32);
-		if (currentMC < numberOfWords){
-			return contents[currentMC];
-		}
-		else return null;
-	}
 }

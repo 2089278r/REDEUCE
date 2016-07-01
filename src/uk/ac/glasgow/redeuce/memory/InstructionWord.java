@@ -11,19 +11,12 @@ public class InstructionWord extends Word {
 	int timing;
 	int go;
 	
-//	public InstructionWord(){
-//		nis = toDecimal(Arrays.copyOfRange(binaryDigits, 1, 4));
-//		source = toDecimal(Arrays.copyOfRange(binaryDigits, 5, 10));
-	//	dest = toDecimal(Arrays.copyOfRange(binaryDigits, 11, 16));
-		//characteristic = toDecimal(Arrays.copyOfRange(binaryDigits, 17, 19));
-		//wait = toDecimal(Arrays.copyOfRange(binaryDigits, 20, 25));
-		//timing = toDecimal(Arrays.copyOfRange(binaryDigits, 25, 30));
-		//go = toDecimal(Arrays.copyOfRange(binaryDigits, 31, 32));
-		
-//	}
-	
-	public InstructionWord(int[] binaryDigits){
-		this.binaryDigits = binaryDigits;
+	public InstructionWord(int[] binaryDigits) throws Exception{
+		for (int i=0; i<32; i++){
+			if (binaryDigits[i] != 1 && binaryDigits[i] != 0){
+				throw new Exception("incorrect format!");
+			}
+		}
 		nis = toDecimal(Arrays.copyOfRange(binaryDigits, 1, 4));
 		source = toDecimal(Arrays.copyOfRange(binaryDigits, 4, 9));
 		dest = toDecimal(Arrays.copyOfRange(binaryDigits, 9, 14));
@@ -42,9 +35,5 @@ public class InstructionWord extends Word {
 		return decimal;
 	}
 	
-	public void main (String args[]){
-		
-		
-		}
-	}
+}
 
