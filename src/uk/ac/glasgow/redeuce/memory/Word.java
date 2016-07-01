@@ -1,19 +1,17 @@
 package uk.ac.glasgow.redeuce.memory;
 
-import java.util.Arrays;
-
-public class Word {
+public abstract class Word {
 	int[] binaryDigits = new int[32];
-	boolean isInstruction;            //Might not be necessary, depends on how card reader is implemented..
-	int dest;
-	int timing;
 	
 	public Word(){
-		Arrays.fill(binaryDigits, 0);
-		isInstruction=true;
+		for (int i=0; i<32; i++){
+			binaryDigits[i] = 0;
+		}
 	}
 	public Word(int[] binaryDigits){
-		this.binaryDigits = binaryDigits;
+		for (int i=0; i<32; i++){
+			this.binaryDigits[i] = binaryDigits[i];
+		}
 	}
 	public int toDecimal(int[] wordSection){
 		int decimal = 0;

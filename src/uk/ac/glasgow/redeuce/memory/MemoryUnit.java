@@ -12,9 +12,12 @@ public abstract class MemoryUnit {
 		this.size = size;
 		this.counter = 0;
 		this.contents = new Word[size];
-		Arrays.fill(contents, new Word());
+		for (int i=0; i<size; i++){
+			contents[i] = new Word();
+		}
 	}
 	void increment(){
+		assert(counter < Integer.MAX_VALUE);
 		counter++;
 	}
 	

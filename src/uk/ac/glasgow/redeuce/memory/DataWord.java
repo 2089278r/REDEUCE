@@ -7,11 +7,8 @@ public class DataWord extends Word{
 	public int[] value;          //Still unsure how data was read in, but we could probably make it work with something like this?
 	
 	public DataWord(int[] binaryDigits) throws Exception {
-		isInstruction = false;
-		dest = toDecimal(Arrays.copyOfRange(binaryDigits, 9, 14));
 		int prevalue = toDecimal(Arrays.copyOfRange(binaryDigits, 14, 24));
 		value = toBackBinary(prevalue);
-		timing = toDecimal(Arrays.copyOfRange(binaryDigits, 25, 30));
 	}
 	
 	public int[] toBackBinary(int cardValue){
@@ -23,5 +20,11 @@ public class DataWord extends Word{
 			binaryValue[31 - i] = digit;
 		}
 		return binaryValue;
+	}
+	
+	public int[] getValue(int[] binaryDigits){
+		int prevalue = toDecimal(Arrays.copyOfRange(binaryDigits, 14, 24));
+		value = toBackBinary(prevalue);
+		return value;
 	}
 }

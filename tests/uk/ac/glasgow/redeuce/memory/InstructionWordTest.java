@@ -10,43 +10,43 @@ public class InstructionWordTest {
 	public void nisTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(7, example.nis);
+		assertEquals(7, example.getNIS());
 	}
 	@Test
 	public void DestTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(31, example.dest);
+		assertEquals(31, example.getDest());
 	}
 	@Test
 	public void SourceTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(31, example.source);
+		assertEquals(31, example.getSource());
 	}
 	@Test
 	public void CharTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(3, example.characteristic);
+		assertEquals(3, example.getChar());
 	}
 	@Test
 	public void WaitTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(31, example.wait);
+		assertEquals(31, example.getWait());
 	}
 	@Test
 	public void TimeTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(31, example.timing);
+		assertEquals(31, example.getTiming());
 	}
 	@Test
 	public void goTest() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		InstructionWord example = new InstructionWord(examplearray);
-		assertEquals(1, example.go);
+		assertEquals(1, example.getGo());
 	}
 	@Test(expected = Exception.class)
 	public void invalidCard() throws Exception {
