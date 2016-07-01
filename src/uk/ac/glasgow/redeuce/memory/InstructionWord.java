@@ -26,14 +26,14 @@ public class InstructionWord extends Word {
 		go = toDecimal(Arrays.copyOfRange(binaryDigits, 31, 32));
 	}
 	
-	public int toDecimal(int[] wordSection){
-		int decimal = 0;
-		for (int i=0; i < wordSection.length; i++){
-			int currentNumber = wordSection[i];
-			decimal += currentNumber*java.lang.Math.pow(2, i);
-		}
-		return decimal;
-	}
+	//private int toDecimal(int[] wordSection){
+	//	int decimal = 0;
+	//	for (int i=0; i < wordSection.length; i++){
+	//		int currentNumber = wordSection[i];
+	//		decimal += currentNumber*java.lang.Math.pow(2, i);
+	//	}
+	//	return decimal;
+	//}
 	
 }
 

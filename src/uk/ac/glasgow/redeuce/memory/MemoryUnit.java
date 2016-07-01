@@ -19,7 +19,7 @@ public abstract class MemoryUnit {
 	}
 	
 	void write(Word word){
-			contents[(counter % size)] = word;
+		contents[(counter % size)] = word;
 	}
 	
 	Word read(){

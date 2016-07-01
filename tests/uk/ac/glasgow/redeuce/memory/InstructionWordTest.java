@@ -51,11 +51,13 @@ public class InstructionWordTest {
 	@Test(expected = Exception.class)
 	public void invalidCard() throws Exception {
 		int[] exampleArray = new int[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2};
+		@SuppressWarnings("unused")
 		InstructionWord example = new InstructionWord(exampleArray);
 	}
 	@Test(expected = Exception.class)
 	public void shortCard() throws Exception {
 		int[] examplearray = new int[] {0,1,1,1};
+		@SuppressWarnings("unused")
 		InstructionWord example = new InstructionWord(examplearray);
 	}
 
