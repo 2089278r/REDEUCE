@@ -1,6 +1,6 @@
 package uk.ac.glasgow.redeuce.memory;
 
-public abstract class Word {
+public class Word {
 	int[] binaryDigits = new int[32];
 	
 	public Word(){

@@ -77,7 +77,10 @@ public class DelayLineTest {
 		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		Word instruction = new Word(examplearray);
 		dl.write(instruction);
-		assertEquals(dl.read().binaryDigits, examplearray);
+		for (int i=0; i<32; i++){
+			dl.increment();
+		}
+		assertEquals(dl.read(), instruction);
 	}
 	
 	@Test

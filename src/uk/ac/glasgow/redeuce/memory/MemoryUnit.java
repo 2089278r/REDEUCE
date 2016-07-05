@@ -1,7 +1,5 @@
 package uk.ac.glasgow.redeuce.memory;
 
-import java.util.Arrays;
-
 public abstract class MemoryUnit {
 	int counter;
 	int size;

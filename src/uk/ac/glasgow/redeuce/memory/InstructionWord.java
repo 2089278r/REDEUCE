@@ -12,6 +12,9 @@ public class InstructionWord extends Word {
 			}
 		}
 	}
+	public InstructionWord(){
+		super();
+	}
 	public int getNIS(){
 		return toDecimal(Arrays.copyOfRange(binaryDigits, 1, 4));
 	}
