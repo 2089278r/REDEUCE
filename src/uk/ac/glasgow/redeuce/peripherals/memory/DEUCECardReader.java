@@ -6,19 +6,17 @@ public class DEUCECardReader {
 	FixedCardDeck deck;
 	Card[] cardsBeingRead;  //Something to simulate the different states the reader can be in?
 	boolean isEmpty;
+	boolean readyToRead;    //Methods from Console, and when instructions are being executed can manipulate this
 	
 	public DEUCECardReader(){
+		this.cardsBeingRead = new Card[3];
+		this.isEmpty = true;
+		this.readyToRead = false;
 	}
 	
 	public void loadDeck(FixedCardDeck deck){
 		this.deck = deck;
-		this.cardsBeingRead = new Card[3];
-	}
-	
-	//Should there be something in this class as well which checks if it is empty or not?
-
-	public void checkEmpty(){
-	    this.isEmpty = false;
+		this.isEmpty = false;
 	}
 	
 	//The actual reading bit, I assume?
