@@ -1,8 +1,8 @@
 package uk.ac.glasgow.redeuce.peripherals.memory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class CRDFileReader {
 	String filename = "";
@@ -13,19 +13,23 @@ public class CRDFileReader {
 	
 
 public FixedCardDeck createNewDeck() throws IOException{
-	BufferedReader reader = new BufferedReader(new FileReader(filename));
-	String currentLine = reader.readLine();
+	File file = new File (filename);
+	Scanner reader = new Scanner(file);
+	String currentLine;
 	FixedCardDeck newDeck = new FixedCardDeck();
-	//This seems awfully messy, not sure if we should hardcode the integer 12 or have
-	//a different statement which says something more like "until blank line reached"...
-	while(currentLine!=null){
+	while(reader.hasNextLine()){
+		currentLine = reader.nextLine().replaceAll("\\s", "");
+		
 		Card newCard = new Card();
-		for (int i=0; i<12; i++){
+		int i = 0;
+		while (i < newCard.getSize()){
 			newCard.changeLine(i, stringToBits(currentLine));
-			currentLine=reader.readLine();
+			if(reader.hasNextLine()){
+				currentLine = reader.nextLine().replaceAll("\\s", "");
+			}
+			i++;
 		}
 		newDeck.addCard(newCard);
-		currentLine = reader.readLine();
 	}
 	reader.close();
 	return newDeck; 
@@ -34,10 +38,9 @@ public FixedCardDeck createNewDeck() throws IOException{
 public CardLine stringToBits(String fileLine){
 	char[] fileElements = fileLine.toCharArray();
 	CardLine newCardLine = new CardLine();
-	for (int i=0; i<35; i++){
-		newCardLine.changeBit(i, fileElements[i] == '1');
+	for (int j=0; j < fileElements.length; j++){
+		newCardLine.changeBit(j, fileElements[j] == '1');
 	}
-	System.out.println(newCardLine.toString());
 	return newCardLine;
 	}
 }

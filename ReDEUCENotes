@@ -1,0 +1,100 @@
+The coding form, though, was a list of instructions in the order in which they were stored in each DL. 
+
+- So perhaps Triads were made in the order of the Delay Lines, and Words were just stored in the order that they were read in?
+  - If they were well coded, there should be no difference in that anyway.
+
+
+"transfer" instructions could NOT happen between different rows of delay lines, as they were "opened" at the same time.
+ - So, "7-8" would always transfer what is in the current MC of 7 into that MC of 8;
+ - To get 7(8) into 8(9) or any other number, it would need to be transferred first into a TS or something similar, and then transferred with wait and timing numbers into the respective DL and MC
+
+Wait and Timing Numbers:
+The Wait number decides when the transfer starts, and the Timing number decides when the transfer ends
+If the Wait number is bigger than the Timing number, the Timing number is effectively T+32 (I suppose we'll just hardcode this)
+
+Characteristic number:
+-FINALLY understand it:
+  - 00 means that a single, normal transfer takes place
+  - 10(1, because backwards binary) means that the transfer will take place for all (T-W+1) microcycles
+  - 01(2, becasue backwards binary) means that there will be 2 transfers, for mc (m+w+2 and m+w+3)
+  - 11(3) should never be used, but were it to happen, it essentially does the same thing as 10
+	If W and T differ, C = 3 has just the same effect as C = 1; that is,
+	a Long Transfer for T - W + 1 minor cycles from m.c. m + W + 2 to m.c.
+	m + T + 2 inclusive,taking the next Instruction from m.c. m + T + 2.
+	(If W exceeds T, read m + T + 34 for m + T + 2 and T - W + 33 for
+	T - W +1).
+
+     	When W = T, C = 3 increases the effective value of T by 32. Transfer
+	is for 33 minor cycles from m + W + 2 to m + W + 34 inclusive (remember
+	W = T) and the next Instruction enters during m.c. m + W + 34.
+
+Adding a number to a a store multiple times will be easier to code and faster than getting the number multiplied by other means.
+- So do the add instruction "X - 25" for 5mc, by having the Wait and Time words in the appropriate amount (T-W+1)
+- AND HAVE THE CHARACTERISTIC BE 1, MEANING MULTIPLE TRANSFERS!!!
+
+
+
+
+
+Instruction Examples and Explanations:
+27-13 : puts 1 into TS13
+   This is because S27 contains the constant "1", so instructions with 27 as the source will transfer 1
+
+27-25: ADDs 1 into TS13
+   This is because S27 contains 1, and D25 means "add the source into TS13"
+
+13-14: puts what is in TS13 into TS14
+   Easy enough; just a simple transer as would happen when both Source and Destination are less than 22
+
+10-24: Signals for the CardPuncher to start (not to punch anything, just to wake up, really)
+    D24 has to do with I/O functions. 10 as the Source is simply how it is; what other Sources do is unclear
+
+16-29: Signals for the CardPuncher to punch out what is in the Destination Register (not sure what's meant to happen with an illegitimate Destination)
+    So the Destination is the value, and S29 just means "print the value"
+
+15-25: ADDs the contents of TS15 into TS13
+    Again, D25 means "add source to TS13"
+
+
+Input/Output instructions:
+"10-24" : starts the puncher
+"12-24" : starts the reader
+"9-24"  : stops the reader or stops the puncher (as they were never used at the same time)
+
+	The Reader has the additional facility of being stopped by a hole
+	punched in column 54 of the card being read. As such a hole passes the
+	reading brushes it stops the Reader just as would the instruction "9 - 24";
+	the Single-Shot occurs for that row (the one in which P34 is punched),
+	but not for any subsequent ones. There is no corresponding facility for
+	the Punch.
+
+^Explains the 34th hole we saw in the CRD files
+
+
+
+Source vs Destination:
+D22: Words sent to D22 are added to D21
+D23: Words sent to D23 are subtracted from D21
+D24: Depending on source (see above), manipulates peripherals of the machine
+D25: Words sent to D25 are added to the contents of TS13
+D26: Words sent to D26 are subtracted from the contents of TS13
+D27: Words sent to D27 are checked whether if their 32nd digit is 1. If so, add 1 to Timing
+D28: Words sent to D28 are checked to be 0 or non-0, 1 is added to Timing if non-0
+D29: Card Puncher should punch out work in Source
+D30: Deals with reading/writing from/to Magnetic Drum (Complex, look into later perhaps)
+D31: Shifts reading/writing heads for the Magnetic Drum (Look into with D30)
+
+S22: Word sent from S22 will be the contents of DS21 divided by 2 (shifted once to the left, because backwards binary, must be careful of minor cycle due to double storage shenanigans)
+S23: Word sent from S23 will be the contents of TS14 divided by 2 (single word)
+S24: Word sent from S24 will be the contents of TS14 multiplied by 2 (shifted up to the right)
+S25: Word sent from S25 will be the word (TS14 & TS15); so there will be a '1' in the indices where both have the same value
+S26: Word sent from S25 will be the word (TS14 & TS15); so there will be a '1' in the indices where both have a different value
+S27: Contains 1000000000000000000000000000000, or, "1"
+S28: Contains smallest unit in Wait (of the currently executing word maybe? rather unclear, honestly)
+S29: Contains most significant digit(32nd digit, again unclear of what...)
+S30: Contains 0 at all times
+S31: All 1s, representing -1 in the signed convention (decrementing is a good use? 31-25 ought to decrement TS13)
+
+
+
+

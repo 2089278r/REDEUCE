@@ -1,8 +1,8 @@
 package uk.ac.glasgow.redeuce.peripherals.memory;
 
 public class Card {
-	CardLine[] lines;
-	int positionInCard;
+	private CardLine[] lines;
+	private int positionInCard;
 	
 	public Card(){
 		lines = new CardLine[12];
@@ -10,11 +10,15 @@ public class Card {
 	}
 	
 	public CardLine getNextLine(){
-		return lines[positionInCard++];
+		return lines[++positionInCard];
 	}
 	
 	public void changeLine(int index, CardLine cardline){
 		lines[index] = cardline;
+	}
+	
+	public int getSize(){
+		return lines.length;
 	}
 
 }
