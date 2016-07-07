@@ -1,4 +1,5 @@
-The coding form, though, was a list of instructions in the order in which they were stored in each DL. 
+
+"The coding form, though, was a list of instructions in the order in which they were stored in each DL." 
 
 - So perhaps Triads were made in the order of the Delay Lines, and Words were just stored in the order that they were read in?
   - If they were well coded, there should be no difference in that anyway.
