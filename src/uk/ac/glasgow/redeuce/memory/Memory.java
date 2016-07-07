@@ -25,4 +25,12 @@ public class Memory {
 			linesAndStores[i].increment();
 		}
 	}
+	
+	public Word getWord(int i){
+		return linesAndStores[i].read();
+	}
+	
+	public void setWord(int i, Word word){
+		linesAndStores[i].write(word);
+	}
 }

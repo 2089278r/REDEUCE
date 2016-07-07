@@ -1,5 +1,7 @@
 package uk.ac.glasgow.redeuce.memory;
 
+import java.util.Arrays;
+
 public class Word {
 	int[] binaryDigits = new int[32];
 	
@@ -20,5 +22,8 @@ public class Word {
 			decimal += currentNumber*java.lang.Math.pow(2, i);
 		}
 		return decimal;
+	}
+	public int getElements(int from, int to){
+		return toDecimal(Arrays.copyOfRange(binaryDigits, from, to));
 	}
 }

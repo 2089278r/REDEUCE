@@ -20,11 +20,16 @@ public class DEUCECardReader {
 		this.isEmpty = false;
 	}
 	
+	public void takeInCards() throws OutOfCardsException{
+		for (int i=0; i<cardsBeingRead.length; i++){
+			cardsBeingRead[i] = deck.getNextCard();
+		}
+	}
+	
 	//The actual reading bit, I assume?
 	//Should this read 3 cards at a time(unless an interrupt from Console..?)
-	public Word[] interpretCards(){
-		//while (!isEmpty() && !isWaiting())
-		    //getNextCard(x 3?)
+	public Word readCard() {
+		
 		return null;
 	}
 }
