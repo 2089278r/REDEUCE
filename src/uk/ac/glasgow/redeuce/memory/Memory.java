@@ -26,6 +26,10 @@ public class Memory {
 		}
 	}
 	
+	public int getMicroCycle(){
+		return ((linesAndStores[1].counter) % 32);
+	}
+	
 	public Word getWord(int i){
 		return linesAndStores[i].read();
 	}

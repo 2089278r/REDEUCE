@@ -10,7 +10,8 @@ public class Card {
 	}
 	
 	public CardLine getNextLine(){
-		return lines[++positionInCard];
+		if (positionInCard>=lines.length) return null;
+		return lines[positionInCard++];
 	}
 	
 	public void changeLine(int index, CardLine cardline){
