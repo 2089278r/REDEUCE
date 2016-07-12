@@ -2,6 +2,8 @@ package uk.ac.glasgow.redeuce.memory;
 
 import static org.junit.Assert.*;
 
+import java.util.BitSet;
+
 import org.junit.Test;
 
 public class DelayLineTest {
@@ -21,22 +23,8 @@ public class DelayLineTest {
 	@Test
 	public void wordContentValueisZero() {
 		DelayLine dl = new DelayLine();
-		Word example = new Word();
 		for (int i=0; i < 32 ; i++){ 
-			assertEquals(example.binaryDigits[i], dl.contents[i].binaryDigits[i]);
-		}
-	}
-	
-	@Test
-	public void wordWrite() {
-		DelayLine dl = new DelayLine();
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
-		for (int i=0; i<32; i++){
-			dl.increment();
-			dl.write(new Word(examplearray));
-		}
-		for (int i=0; i<32; i++){
-			assertEquals(examplearray[i], dl.contents[i].binaryDigits[i]);
+			assertEquals(dl.contents[i].getElements(0, 31), 0);
 		}
 	}
 	
@@ -60,7 +48,11 @@ public class DelayLineTest {
 	@Test
 	public void wordWriteThenReadNext() {
 		DelayLine dl = new DelayLine();
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
+		BitSet examplearray = new BitSet();
+		examplearray.set(1);
+		examplearray.set(2);
+		examplearray.set(3);
+		examplearray.set(5);
 		Word instruction = new Word(examplearray);
 		dl.write(instruction);
 		dl.increment();
@@ -74,7 +66,8 @@ public class DelayLineTest {
 		for (int i=0; i<35; i++){
 			dl.increment();
 		}
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
+		BitSet examplearray = new BitSet();
+		examplearray.set(1);
 		Word instruction = new Word(examplearray);
 		dl.write(instruction);
 		for (int i=0; i<32; i++){

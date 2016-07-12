@@ -5,9 +5,15 @@ import uk.ac.glasgow.redeuce.memory.Word;
 public class Instruction {
 	
 	Word word;
+	int currentPlace;
 	
 	public Instruction(Word word){
 		this.word = word;
+	}
+	
+	public Instruction(Word word, int delayLine){
+		this.word = word;
+		this.currentPlace = delayLine;
 	}
 	
 	

@@ -1,7 +1,7 @@
 package uk.ac.glasgow.redeuce.peripherals.memory;
 
 public class Card {
-	private CardLine[] lines;
+	public CardLine[] lines;
 	private int positionInCard;
 	
 	public Card(){
@@ -20,6 +20,10 @@ public class Card {
 	
 	public int getSize(){
 		return lines.length;
+	}
+	
+	public boolean onLastLine(){
+		return (positionInCard >= lines.length);
 	}
 
 }

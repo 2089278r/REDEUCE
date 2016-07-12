@@ -1,40 +1,35 @@
 package uk.ac.glasgow.redeuce.memory;
 
-import java.util.Arrays;
+import java.util.BitSet;
 
 public class InstructionWord extends Word {
 	
-	public InstructionWord(int[] binaryDigits) throws Exception{
+	public InstructionWord(BitSet binaryDigits) throws Exception{
 		super(binaryDigits);
-		for (int i=0; i<32; i++){
-			if (binaryDigits[i] != 1 && binaryDigits[i] != 0){
-				throw new Exception("incorrect format!");
-			}
-		}
 	}
 	public InstructionWord(){
 		super();
 	}
 	public int getNIS(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 1, 4));
+		return (getElements(1, 4));
 	}
 	public int getSource(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 4, 9));
+		return (getElements(4, 9));
 	}
 	public int getDest(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 9, 14));
+		return (getElements(9, 14));
 	}
 	public int getChar(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 14, 16));
+		return (getElements(14, 16));
 	}
 	public int getWait(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 16, 21));
+		return (getElements(16, 21));
 	}
 	public int getTiming(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 25, 30));
+		return (getElements(25, 30));
 	}
 	public int getGo(){
-		return toDecimal(Arrays.copyOfRange(binaryDigits, 31, 32));
+		return (getElements(31, 32));
 	}
 	
 }

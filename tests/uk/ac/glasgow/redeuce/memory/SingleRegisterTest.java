@@ -2,10 +2,26 @@ package uk.ac.glasgow.redeuce.memory;
 
 import static org.junit.Assert.*;
 
+import java.util.BitSet;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class SingleRegisterTest {
 
+	BitSet fullWord;
+
+	@Before public void initialise(){
+		fullWord = new BitSet(32);
+		for (int i=1; i<=20; i++){
+			fullWord.set(i);
+		}
+		for (int i=25; i<=29; i++){
+			fullWord.set(i);
+		}
+		fullWord.set(31);
+		
+	}
 	@Test
 	public void sizeTest() {
 		SingleRegister register = new SingleRegister();
@@ -27,8 +43,7 @@ public class SingleRegisterTest {
 	@Test
 	public void wordWrite() {
 		SingleRegister register = new SingleRegister();
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
-		Word instruction = new Word(examplearray);
+		Word instruction = new Word(fullWord);
 		register.write(instruction);
 		assertEquals(instruction, register.contents[0]);
 	}
@@ -45,7 +60,7 @@ public class SingleRegisterTest {
 		SingleRegister register = new SingleRegister();
 		register.write(new Word());
 		Word registerValue = register.read();
-		assertEquals(register.contents[0].binaryDigits, registerValue.binaryDigits);
+		assertEquals(register.contents[0].getElements(0, 31), registerValue.getElements(0, 31));
 	}
 
 }

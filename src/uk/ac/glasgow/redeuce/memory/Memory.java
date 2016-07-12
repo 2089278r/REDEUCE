@@ -21,7 +21,7 @@ public class Memory {
 	}
 	
 	public void increment(){
-		for (int i=1; i<=linesAndStores.length; i++){
+		for (int i=1; i<linesAndStores.length; i++){
 			linesAndStores[i].increment();
 		}
 	}
@@ -30,11 +30,11 @@ public class Memory {
 		return ((linesAndStores[1].counter) % 32);
 	}
 	
-	public Word getWord(int i){
-		return linesAndStores[i].read();
+	public Word getWord(int delayLine){
+		return linesAndStores[delayLine].read();
 	}
 	
-	public void setWord(int i, Word word){
-		linesAndStores[i].write(word);
+	public void setWord(int toDelayLine, Word word){
+		linesAndStores[toDelayLine].write(word);
 	}
 }

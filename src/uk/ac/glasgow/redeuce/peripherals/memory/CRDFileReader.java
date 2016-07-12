@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class CRDFileReader {
 	String filename = "";
 	
-	CRDFileReader(String filename){
+	public CRDFileReader(String filename){
 		this.filename = filename;
 	}
 	

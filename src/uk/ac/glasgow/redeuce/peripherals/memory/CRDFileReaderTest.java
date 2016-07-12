@@ -34,10 +34,13 @@ public class CRDFileReaderTest {
 		Card firstCard = newDeck.getNextCard();
 		CardLine testRow = firstCard.getNextLine();
 		testRow = firstCard.getNextLine();
-		assertTrue(testRow.bits.get(4) == true);
+		System.out.println(testRow.getBits().length());
+		assertTrue(testRow.getBits().get(4) == true);
+		testRow = firstCard.getNextLine();
+		
 		testRow = firstCard.getNextLine();
 		testRow = firstCard.getNextLine();
-		assertTrue(testRow.bits.get(4) == true);
+		assertTrue(testRow.getBits().get(4) == true);
 	}
 	
 	@Test(expected=OutOfCardsException.class)

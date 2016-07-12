@@ -2,6 +2,8 @@ package uk.ac.glasgow.redeuce.memory;
 
 import static org.junit.Assert.*;
 
+import java.util.BitSet;
+
 import org.junit.Test;
 
 public class DoubleRegisterTest {
@@ -27,7 +29,7 @@ public class DoubleRegisterTest {
 	@Test
 	public void wordWrite() {
 		DoubleRegister register = new DoubleRegister();
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
+		BitSet examplearray = new BitSet();
 		register.increment();
 		Word instruction = new Word(examplearray);
 		register.write(instruction);
@@ -42,14 +44,6 @@ public class DoubleRegisterTest {
 		assertEquals(registerValue, register.contents[1]);
 	}
 	
-	@Test
-	public void wordWriteThenRead() {
-		DoubleRegister register = new DoubleRegister();
-		register.increment();
-		register.write(new Word());
-		Word registerValue = register.read();
-		assertEquals(register.contents[1].binaryDigits, registerValue.binaryDigits);
-	}
 
 }
 

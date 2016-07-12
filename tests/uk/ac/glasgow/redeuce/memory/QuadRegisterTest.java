@@ -2,9 +2,26 @@ package uk.ac.glasgow.redeuce.memory;
 
 import static org.junit.Assert.*;
 
+import java.util.BitSet;
+
+import org.junit.Before;
 import org.junit.Test;
 
 public class QuadRegisterTest {
+	
+	BitSet fullWord;
+
+	@Before public void initialise(){
+		fullWord = new BitSet(32);
+		for (int i=1; i<=20; i++){
+			fullWord.set(i);
+		}
+		for (int i=25; i<=29; i++){
+			fullWord.set(i);
+		}
+		fullWord.set(31);
+		
+	}
 
 	@Test
 	public void sizeTest() {
@@ -27,11 +44,10 @@ public class QuadRegisterTest {
 	@Test
 	public void wordWrite() {
 		QuadRegister register = new QuadRegister();
-		int[] examplearray = new int[] {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,1};
 		register.increment();
 		register.increment();
 		register.increment();
-		Word instruction = new Word(examplearray);
+		Word instruction = new Word(fullWord);
 		register.write(instruction);
 		assertEquals(instruction, register.contents[3]);
 	}
@@ -44,17 +60,6 @@ public class QuadRegisterTest {
 		register.increment();
 		Word registerValue = register.read();
 		assertEquals(registerValue, register.contents[3]);
-	}
-	
-	@Test
-	public void wordWriteThenRead() {
-		QuadRegister register = new QuadRegister();
-		register.increment();
-		register.increment();
-		register.increment();
-		register.write(new Word());
-		Word registerValue = register.read();
-		assertEquals(register.contents[3].binaryDigits, registerValue.binaryDigits);
 	}
 
 
