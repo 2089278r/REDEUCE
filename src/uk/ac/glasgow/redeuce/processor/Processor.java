@@ -53,6 +53,90 @@ public class Processor {
 		return this.go;
 	}
 	
+	public Word getSource(Instruction instr){
+		Word operand;
+		BitSet newWordBits;
+		BitSet oldWord;
+		if (instr.getSource() >21){
+			switch (instr.getSource()){
+				case 22: 
+					newWordBits = new BitSet();
+					oldWord = deuceMemory.getWord(21).getBits();
+					//Not really just a "move left" operation, sadly... I hope this'll do?
+					for (int i=0; i<oldWord.length(); i++){
+						if(oldWord.get(i+1) == true){
+							newWordBits.set(i);
+						}
+					}
+					operand = new Word(newWordBits);
+					return operand;
+					break;
+				case 23:
+					newWordBits = new BitSet();
+					oldWord = deuceMemory.getWord(14).getBits();
+					//Not really just a "move left" operation, sadly... I hope this'll do?
+					for (int i=0; i<oldWord.length(); i++){
+						if(oldWord.get(i+1) == true){
+							newWordBits.set(i);
+						}
+					}
+					operand = new Word(newWordBits);
+					return operand;
+				case 24:
+					newWordBits = new BitSet();
+					oldWord = deuceMemory.getWord(21).getBits();
+					//Not really just a "move right" operation, sadly... I hope this'll do?
+					for (int i=1; i<=oldWord.length(); i++){
+						if(oldWord.get(i-1) == true){
+							newWordBits.set(i);
+						}
+					}
+					operand = new Word(newWordBits);
+					return operand;
+				case 25:
+					newWordBits = deuceMemory.getWord(14).getBits();
+					oldWord = deuceMemory.getWord(15).getBits();
+					newWordBits.and(oldWord);
+					operand = new Word(newWordBits);
+					return operand;
+				case 26:
+					newWordBits = deuceMemory.getWord(14).getBits();
+					oldWord = deuceMemory.getWord(15).getBits();
+					newWordBits.xor(oldWord);
+					operand = new Word(newWordBits);
+					return operand;
+				case 27:
+					BitSet newBits = new BitSet(32);
+					newBits.set(0);
+					operand = new Word(newBits);
+					return operand;
+				case 28:
+					//Honestly, this one makes no sense to me
+					break;
+				case 29:
+					//Again, just no idea what the manual means
+					break;
+				case 30:
+					operand = new Word(new BitSet(32));
+					return operand;
+				case 31:
+					BitSet negativeOne = new BitSet(32);
+					for (int i=0; i<32; i++){
+						negativeOne.set(i);
+					}
+					operand = new Word(negativeOne);
+					return operand;
+				default:
+					System.out.println("uhhhh...");
+					break;
+				}
+		}
+		else {
+			operand = deuceMemory.getWord(instr.getSource());
+			return operand;
+		}
+	}
+	
 	public void executeInstruction() throws InterruptedException{
 		int source = this.currentInstruction.getSource();
 		int dest = this.currentInstruction.getDest();
@@ -63,48 +147,80 @@ public class Processor {
 		int numberOfExecutions;
 		
 		// Huge nasty switch statement, or at least something which defines the types?
-		
-		switch(characteristic){
-			case 1:
-				numberOfExecutions = (timing - wait + 1);
-				break;
-			case 2:
-				numberOfExecutions = 2;
-		}
 	
 		switch(currentInstruction.getType()){
 			case ARITHMETIC:
-				executeArithmetic();
+				executeArithmetic(currentInstruction);
 				break;
 			case DISCRIM:
-				executeDiscrim();
+				executeDiscrim(currentInstruction);
 				break;
 			case IO:
-				executeIO();
+				executeIO(currentInstruction);
 				break;
 			case OTHER:
-				
 				break;
 			case TRANSFER:
-				executeTransfer();
+				executeTransfer(currentInstruction);
 				break;
 			default:
 				System.out.println("Something must've gone wrong...");
-				break;
 		}
-		
-		if (go == 1){
-			return;
-		}
-		getNextInstruction();
-//		executeInstruction();
 	}
 	
-	//Won't do when timing gets involved
-	//Preferably tickClock will only be called in the execution function
-	public void transfer(int source, int destination, int numberOfExecutions){
-		Word from = this.deuceMemory.getWord(source);
-		this.deuceMemory.setWord(destination, from);
+	//All examples only involve a Temporary store and a Delay Line, or some function other than just writing...
+	//So I honestly have little confidence in what "long transfers" of read/writes actually did in practice...
+	public void executeTransfer(Instruction instruction){
+			int necessaryTicks = instruction.getTiming() + 2;
+			tickClock();
+			tickClock();
+			for (int i=0; i<instruction.getWait(); i++){
+				tickClock();
+				necessaryTicks--;
+			}
+			for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
+				Word from = this.deuceMemory.getWord(instruction.getSource());
+				this.deuceMemory.setWord(instruction.getDest(), from);
+				necessaryTicks--;
+			}
+			while (necessaryTicks > 0){
+				tickClock();
+			}
+			
+		}
+	
+	public void executeArithmetic(Instruction instruction){
+		int necessaryTicks = instruction.getTiming() + 2;
+		tickClock();
+		tickClock();
+		for (int i=0; i<instruction.getWait(); i++){
+			tickClock();
+			necessaryTicks--;
+		}
+		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
+			Word from = this.deuceMemory.getWord(instruction.getSource());
+			this.deuceMemory.setWord(instruction.getDest(), from);
+			necessaryTicks--;
+		}
+		while (necessaryTicks > 0){
+			tickClock();
+		}
+		
+	}
+	
+	
+	//A function for the execution instructions to run to see how many times they need to repeat.
+	//Not yet tested, but it seems like it'd solve our Characteristic problem perhaps?
+	public int getNumberOfExecutions(Instruction instr){
+		if (instr.getChar() == 2){
+			return 2;
+		}
+		else if (instr.getChar() == 1){
+			return (instr.getTiming() - instr.getWait() + 1);
+		}
+		else {
+			return 1;
+		}
 	}
 	
 	public int readyDelayLine() throws OutOfCardsException{
