@@ -74,6 +74,7 @@ public class ProcessorTest {
 	@Test
 	public void transferTest() throws InterruptedException{
 		BitSet bits = new BitSet(32);
+		//0100 1100 0001
 		bits.set(1);
 		bits.set(4);
 		bits.set(5);
@@ -90,7 +91,7 @@ public class ProcessorTest {
 		otherBits.set(31);
 		proc.deuceMemory.setWord(1, new Word(otherBits));
 		while(proc.deuceMemory.getMicroCycle() != 0){
-			//System.out.println("Microcycle: " + proc.deuceMemory.getMicroCycle() + " has word " + proc.deuceMemory.getWord(1).getBits());
+			System.out.println("Microcycle: " + proc.deuceMemory.getMicroCycle() + " has word " + proc.deuceMemory.getWord(1).getBits());
 			proc.tickClock();
 		}
 		Instruction instr = new Instruction(proc.deuceMemory.getWord(1));

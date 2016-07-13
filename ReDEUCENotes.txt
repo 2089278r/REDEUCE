@@ -74,16 +74,6 @@ Input/Output instructions:
 
 
 Source vs Destination:
-D22: Words sent to D22 are added to DS21
-D23: Words sent to D23 are subtracted from DS21
-D24: Depending on source (see above), manipulates peripherals of the machine
-D25: Words sent to D25 are added to the contents of TS13
-D26: Words sent to D26 are subtracted from the contents of TS13
-D27: Words sent to D27 are checked whether if their 32nd digit is 1. If so, add 1 to Timing
-D28: Words sent to D28 are checked to be 0 or non-0, 1 is added to Timing if non-0
-D29: Card Puncher should punch out work in Source
-D30: Deals with reading/writing from/to Magnetic Drum (Complex, look into later perhaps)
-D31: Shifts reading/writing heads for the Magnetic Drum (Look into with D30)
 
 S22: Word sent from S22 will be the contents of DS21 divided by 2 (shifted once to the left, because backwards binary, must be careful of minor cycle due to double storage shenanigans)
 S23: Word sent from S23 will be the contents of TS14 divided by 2 (single word)
@@ -94,7 +84,19 @@ S27: Contains 1000000000000000000000000000000, or, "1"
 S28: Contains smallest unit in Wait (of the currently executing word maybe? rather unclear, honestly)
 S29: Contains most significant digit(32nd digit, again unclear of what...)
 S30: Contains 0 at all times
-S31: All 1s, representing -1 in the signed convention (decrementing is a good use? 31-25 ought to decrement TS13)
+S31: All 1s, representing -1 in the signed convention (decrementing is
+a good use? 31-25 ought to decrement TS13)
+
+D22: Words sent to D22 are added to DS21
+D23: Words sent to D23 are subtracted from DS21
+D24: Depending on source (see above), manipulates peripherals of the machine
+D25: Words sent to D25 are added to the contents of TS13
+D26: Words sent to D26 are subtracted from the contents of TS13
+D27: Words sent to D27 are checked whether if their 32nd digit is 1. If so, add 1 to Timing
+D28: Words sent to D28 are checked to be 0 or non-0, 1 is added to Timing if non-0
+D29: Card Puncher should punch out work in Source
+D30: Deals with reading/writing from/to Magnetic Drum (Complex, look into later perhaps)
+D31: Shifts reading/writing heads for the Magnetic Drum (Look into with D30)
 
 
 

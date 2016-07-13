@@ -10,12 +10,16 @@ import uk.ac.glasgow.redeuce.peripherals.memory.CardLine;
 import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardReader;
 import uk.ac.glasgow.redeuce.peripherals.memory.OutOfCardsException;
 import uk.ac.glasgow.redeuce.peripherals.memory.Triad;
+import uk.ac.glasgow.redeuce.processor.Instruction.instructionType;
+
+
+// Make just about everything that isn't called from outside Private
 
 public class Processor {
 	
 	Instruction currentInstruction;
 	DEUCECardReader reader;
-	int currentDelayLine;
+	int currentDelayLine; //Just for testing afaik
 	boolean go;
 	Memory deuceMemory; //For testing purposes I suppose? I guess we'll have a large object later where the processor can just read memory?
 	
@@ -42,7 +46,7 @@ public class Processor {
 	
 	public void getNextInstruction(){
 		 int nextDelayLine = currentInstruction.getNIS();
-		 this.currentInstruction = new Instruction(deuceMemory.getWord(nextDelayLine), nextDelayLine); //To keep track of where we are (maybe just for testing...)
+		 this.currentInstruction = new Instruction(deuceMemory.getWord(nextDelayLine)); //To keep track of where we are (maybe just for testing...)
 	}
 	
 	public boolean getGo(){
@@ -56,45 +60,75 @@ public class Processor {
 		int wait = this.currentInstruction.getWait();
 		int timing = this.currentInstruction.getTiming();
 		int go = this.currentInstruction.getGo();
+		int numberOfExecutions;
 		
 		// Huge nasty switch statement, or at least something which defines the types?
-		if ((source <= 21) && (dest <= 21)){
-			transfer(source, dest);
+		
+		switch(characteristic){
+			case 1:
+				numberOfExecutions = (timing - wait + 1);
+				break;
+			case 2:
+				numberOfExecutions = 2;
+		}
+	
+		switch(currentInstruction.getType()){
+			case ARITHMETIC:
+				executeArithmetic();
+				break;
+			case DISCRIM:
+				executeDiscrim();
+				break;
+			case IO:
+				executeIO();
+				break;
+			case OTHER:
+				
+				break;
+			case TRANSFER:
+				executeTransfer();
+				break;
+			default:
+				System.out.println("Something must've gone wrong...");
+				break;
 		}
 		
 		if (go == 1){
 			return;
 		}
 		getNextInstruction();
-		executeInstruction();
+//		executeInstruction();
 	}
 	
-	public void transfer(int source, int destination){
+	//Won't do when timing gets involved
+	//Preferably tickClock will only be called in the execution function
+	public void transfer(int source, int destination, int numberOfExecutions){
 		Word from = this.deuceMemory.getWord(source);
 		this.deuceMemory.setWord(destination, from);
-		tickClock();
-		tickClock();
 	}
 	
-	public int initialInput() throws OutOfCardsException{
+	public int readyDelayLine() throws OutOfCardsException{
 		reader.takeInCards();
 		Triad currentTriad = reader.getTriad();
 		int delayLine = currentTriad.getDelayLine();
 		return delayLine;
 	}
 	
-	public void readLines() throws OutOfCardsException {
-		int delayLine = initialInput();
-		Card currentCard = reader.getTriad().getCurrentCard();
-		CardLine currentLine;
-		while (currentCard != null){
-			currentLine = currentCard.getNextLine();
-			while (currentLine != null){
-				deuceMemory.setWord(delayLine, new Word(currentLine.getBits()));
-				tickClock();
+	//Change names 
+	//Read as long as there is another Triad (another while)
+	public void initialInput() throws OutOfCardsException {
+		while(!reader.isEmpty()){
+			int delayLine = readyDelayLine();
+			Card currentCard = reader.getTriad().getCurrentCard();
+			CardLine currentLine;
+			while (currentCard != null){
 				currentLine = currentCard.getNextLine();
-			}
-			currentCard = reader.getTriad().getNext();
+				while (currentLine != null){
+					deuceMemory.setWord(delayLine, new Word(currentLine.getBits()));
+					tickClock();
+					currentLine = currentCard.getNextLine();
+				}
+				currentCard = reader.getTriad().getNext();
 		}
 		
 	}
