@@ -171,6 +171,7 @@ public class Processor {
 	//All examples only involve a Temporary store and a Delay Line, or some function other than just writing...
 	//So I honestly have little confidence in what "long transfers" of read/writes actually did in practice...
 	public void executeTransfer(Instruction instruction){
+			//Maybe this works for our looping concerns?
 			int necessaryTicks = instruction.getTiming() + 2;
 			tickClock();
 			tickClock();
@@ -189,23 +190,17 @@ public class Processor {
 			
 		}
 	
-	public void executeArithmetic(Instruction instruction){
-		int necessaryTicks = instruction.getTiming() + 2;
-		tickClock();
-		tickClock();
-		for (int i=0; i<instruction.getWait(); i++){
-			tickClock();
-			necessaryTicks--;
-		}
-		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
-			Word from = this.deuceMemory.getWord(instruction.getSource());
-			this.deuceMemory.setWord(instruction.getDest(), from);
-			necessaryTicks--;
-		}
-		while (necessaryTicks > 0){
-			tickClock();
-		}
-		
+	
+	public void executeArithmetic(Instruction instruction){	
+		//Get source, check which kind of arithmetic, execute accordingly
+	}
+	
+	public void executeDiscrim(Instruction instruction){
+		//Get source, check which discrimination instruction it is, execute accordingly
+	}
+	
+	public void executeIO(Instruction instruction){
+		//Get source, check which IO instruction it is, execute accordingly
 	}
 	
 	
