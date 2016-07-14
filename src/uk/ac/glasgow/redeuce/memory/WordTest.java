@@ -11,9 +11,9 @@ public class WordTest {
 		Word testWord = new Word(example);
 		for (int i=0; i<testWord.getBits().length(); i++){
 			if(testWord.getBits().get(i) == false){
-				System.out.print("0");
+			//	System.out.print("0");
 			}
-			else System.out.print("1");
+			//else System.out.print("1");
 		}
 	}
 	
@@ -23,10 +23,31 @@ public class WordTest {
 		Word testWord = new Word(example);
 		for (int i=0; i<testWord.getBits().length(); i++){
 			if(testWord.getBits().get(i) == false){
-				System.out.print("0");
+				//System.out.print("0");
 			}
-			else System.out.print("1");
+			//else System.out.print("1");
 		}
+	}
+	
+	@Test
+	public void toStringTest(){
+		Word testWord = new Word(0);
+		String output = testWord.toString();
+		System.out.println(output);
+	}
+	
+	@Test
+	public void otherToStringTest(){
+		Word testWord = new Word(0, 0, 0, 0, 0, 0, 0);
+		String output = testWord.toString();
+		System.out.println(output);
+	}
+	
+	@Test
+	public void humanCodeToStringTest(){
+		Word testWord = new Word (1, 27, 16, 1, 0, 0, 1);
+		String output = testWord.toString();
+		System.out.println(output);
 	}
 }
 

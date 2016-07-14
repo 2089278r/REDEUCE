@@ -33,11 +33,6 @@ public class ProcessorTest {
 		//this.deuceMemory = new Memory();
 		reader.loadDeck(newDeck);
 	}
-	@Test
-	public void initialInputTest() throws OutOfCardsException, IOException {
-		int delayLine = proc.readyDelayLine();
-		assertEquals(7, delayLine);
-	}
 	
 	//Making sure the right destination places were printed out; seems like memory is working
 	@Test
@@ -97,5 +92,7 @@ public class ProcessorTest {
 		proc.executeInstruction();
 		assertEquals(1, proc.currentInstruction.getGo());
 	}
+	
+	
 
 }
