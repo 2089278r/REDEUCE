@@ -35,19 +35,19 @@ public class ProcessorTest {
 	}
 	@Test
 	public void initialInputTest() throws OutOfCardsException, IOException {
-		int delayLine = proc.initialInput();
+		int delayLine = proc.readyDelayLine();
 		assertEquals(7, delayLine);
 	}
 	
 	//Making sure the right destination places were printed out; seems like memory is working
 	@Test
 	public void readLinesTest() throws OutOfCardsException{
-		proc.readLines();
+		proc.initialInput();
 		while (!(proc.getCounter() == 0)){
 			this.proc.tickClock();
 		}
 		for (int i=0; i<32; i++){
-			//System.out.println(proc.getCounter() + ": " + proc.getWord(7).getElements(4, 9));
+			System.out.println(proc.getCounter() + ": " + proc.getWord(7).getElements(4, 9));
 			this.proc.tickClock();
 		}
 	}
@@ -66,9 +66,7 @@ public class ProcessorTest {
 		bits.set(12);
 		memory.setWord(1, new Word(bits));
 		Instruction instr = new Instruction(memory.getWord(1));
-		//System.out.println(instr.getNIS());
-		//System.out.println(instr.getDest());
-		//System.out.println(instr.getSource());
+		System.out.println(instr.toString());
 	}
 	
 	@Test

@@ -11,6 +11,18 @@ public class Word {
 	public Word(BitSet bits){
 		this.binaryDigits = bits;
 	}
+	
+	public Word(int calculatedNumber){
+		this.binaryDigits = new BitSet(32);
+		String bits = Integer.toBinaryString(calculatedNumber);
+		bits = new StringBuilder(bits).reverse().toString();
+		char[] bitCharacters = bits.toCharArray();
+		for (int i=0; i<bitCharacters.length; i++){
+			if (bitCharacters[i] == '1'){
+				this.binaryDigits.set(i);	
+			}
+		}
+	}
 
 	public int toDecimal(BitSet bits){
 		int decimal = 0;
@@ -30,5 +42,8 @@ public class Word {
 	}
 	public BitSet getBits(){
 		return this.binaryDigits.get(0, 32);
+	}
+	public int getAsInt(){
+		return toDecimal(this.getBits());
 	}
 }

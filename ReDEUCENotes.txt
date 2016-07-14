@@ -78,8 +78,9 @@ Source vs Destination:
 S22: Word sent from S22 will be the contents of DS21 divided by 2 (shifted once to the left, because backwards binary, must be careful of minor cycle due to double storage shenanigans)
 S23: Word sent from S23 will be the contents of TS14 divided by 2 (single word)
 S24: Word sent from S24 will be the contents of TS14 multiplied by 2 (shifted up to the right)
-S25: Word sent from S25 will be the word (TS14 & TS15); so there will be a '1' in the indices where both have the same value
-S26: Word sent from S25 will be the word (TS14 & TS15); so there will be a '1' in the indices where both have a different value
+S25: Word sent from S25 will be the word (TS14 & TS15); so there will
+be a '1' in the indices where both have a 1
+S26: Word sent from S25 will be the word (TS14 XOR TS15); so there will be a '1' in the indices where both have a different value
 S27: Contains 1000000000000000000000000000000, or, "1"
 S28: Contains smallest unit in Wait (of the currently executing word maybe? rather unclear, honestly)
 S29: Contains most significant digit(32nd digit, again unclear of what...)

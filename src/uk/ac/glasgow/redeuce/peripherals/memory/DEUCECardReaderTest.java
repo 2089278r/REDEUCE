@@ -15,7 +15,7 @@ public class DEUCECardReaderTest {
 		FixedCardDeck newDeck = testReader.createNewDeck();
 		DEUCECardReader reader = new DEUCECardReader();
 		reader.loadDeck(newDeck);
-		int delayLine = reader.getDelayLine(newDeck.getNextCard());
+		int delayLine = reader.getTriad().delayLine;
 		assertTrue(delayLine == 8);
 	}
 	
@@ -27,8 +27,7 @@ public class DEUCECardReaderTest {
 		DEUCECardReader reader = new DEUCECardReader();
 		reader.loadDeck(newDeck);
 		reader.takeInCards();
-		assertTrue(reader.triad.length == 3);
-		assertTrue(reader.triad[0].getNextLine().bits.cardinality() == 4);	
+		assertTrue(reader.triad.getCurrentCard().getNextLine().getBits().cardinality() == 4);	
 	}
 	
 	@Test
@@ -39,6 +38,6 @@ public class DEUCECardReaderTest {
 		DEUCECardReader reader = new DEUCECardReader();
 		reader.loadDeck(newDeck);
 		reader.takeInCards();
-		reader.readFirstCard();
+		assertTrue(true);
 	}
 }

@@ -1,8 +1,8 @@
 package uk.ac.glasgow.redeuce.processor;
 
 import java.util.BitSet;
-import java.util.concurrent.TimeUnit;
 
+import uk.ac.glasgow.redeuce.DeuceConstants;
 import uk.ac.glasgow.redeuce.memory.Memory;
 import uk.ac.glasgow.redeuce.memory.Word;
 import uk.ac.glasgow.redeuce.peripherals.memory.Card;
@@ -10,7 +10,6 @@ import uk.ac.glasgow.redeuce.peripherals.memory.CardLine;
 import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardReader;
 import uk.ac.glasgow.redeuce.peripherals.memory.OutOfCardsException;
 import uk.ac.glasgow.redeuce.peripherals.memory.Triad;
-import uk.ac.glasgow.redeuce.processor.Instruction.instructionType;
 
 
 // Make just about everything that isn't called from outside Private
@@ -53,99 +52,89 @@ public class Processor {
 		return this.go;
 	}
 	
-	public Word getSource(Instruction instr){
+	public Word analyseSource(Instruction instr){
 		Word operand;
 		BitSet newWordBits;
 		BitSet oldWord;
-		if (instr.getSource() >21){
-			switch (instr.getSource()){
-				case 22: 
-					newWordBits = new BitSet();
-					oldWord = deuceMemory.getWord(21).getBits();
-					//Not really just a "move left" operation, sadly... I hope this'll do?
-					for (int i=0; i<oldWord.length(); i++){
-						if(oldWord.get(i+1) == true){
-							newWordBits.set(i);
-						}
-					}
-					operand = new Word(newWordBits);
-					return operand;
-					break;
-				case 23:
-					newWordBits = new BitSet();
-					oldWord = deuceMemory.getWord(14).getBits();
-					//Not really just a "move left" operation, sadly... I hope this'll do?
-					for (int i=0; i<oldWord.length(); i++){
-						if(oldWord.get(i+1) == true){
-							newWordBits.set(i);
-						}
-					}
-					operand = new Word(newWordBits);
-					return operand;
-				case 24:
-					newWordBits = new BitSet();
-					oldWord = deuceMemory.getWord(21).getBits();
-					//Not really just a "move right" operation, sadly... I hope this'll do?
-					for (int i=1; i<=oldWord.length(); i++){
-						if(oldWord.get(i-1) == true){
-							newWordBits.set(i);
-						}
-					}
-					operand = new Word(newWordBits);
-					return operand;
-				case 25:
-					newWordBits = deuceMemory.getWord(14).getBits();
-					oldWord = deuceMemory.getWord(15).getBits();
-					newWordBits.and(oldWord);
-					operand = new Word(newWordBits);
-					return operand;
-				case 26:
-					newWordBits = deuceMemory.getWord(14).getBits();
-					oldWord = deuceMemory.getWord(15).getBits();
-					newWordBits.xor(oldWord);
-					operand = new Word(newWordBits);
-					return operand;
-				case 27:
-					BitSet newBits = new BitSet(32);
-					newBits.set(0);
-					operand = new Word(newBits);
-					return operand;
-				case 28:
-					//Honestly, this one makes no sense to me
-					break;
-				case 29:
-					//Again, just no idea what the manual means
-					break;
-				case 30:
-					operand = new Word(new BitSet(32));
-					return operand;
-				case 31:
-					BitSet negativeOne = new BitSet(32);
-					for (int i=0; i<32; i++){
-						negativeOne.set(i);
-					}
-					operand = new Word(negativeOne);
-					return operand;
-				default:
-					System.out.println("uhhhh...");
-					break;
+		switch (instr.getSource()) {
+		case 22:
+			newWordBits = new BitSet();
+			oldWord = deuceMemory.getWord(21).getBits();
+			// Not really just a "move left" operation, sadly... I hope this'll
+			// do?
+			for (int i = 0; i < oldWord.length(); i++) {
+				if (oldWord.get(i + 1) == true) {
+					newWordBits.set(i);
 				}
-		}
-		else {
+			}
+			operand = new Word(newWordBits);
+			return operand;
+		case 23:
+			newWordBits = new BitSet();
+			oldWord = deuceMemory.getWord(14).getBits();
+			// Not really just a "move left" operation, sadly... I hope this'll
+			// do?
+			for (int i = 0; i < oldWord.length(); i++) {
+				if (oldWord.get(i + 1) == true) {
+					newWordBits.set(i);
+				}
+			}
+			operand = new Word(newWordBits);
+			return operand;
+		case 24:
+			newWordBits = new BitSet();
+			oldWord = deuceMemory.getWord(21).getBits();
+			// Not really just a "move right" operation, sadly... I hope this'll
+			// do?
+			for (int i = 1; i <= oldWord.length(); i++) {
+				if (oldWord.get(i - 1) == true) {
+					newWordBits.set(i);
+				}
+			}
+			operand = new Word(newWordBits);
+			return operand;
+		case 25:
+			newWordBits = deuceMemory.getWord(14).getBits();
+			oldWord = deuceMemory.getWord(15).getBits();
+			newWordBits.and(oldWord);
+			operand = new Word(newWordBits);
+			return operand;
+		case 26:
+			newWordBits = deuceMemory.getWord(14).getBits();
+			oldWord = deuceMemory.getWord(15).getBits();
+			newWordBits.xor(oldWord);
+			operand = new Word(newWordBits);
+			return operand;
+		case 27:
+			BitSet newBits = new BitSet(32);
+			newBits.set(0);
+			operand = new Word(newBits);
+			return operand;
+		case 28:
+			// Honestly, this one makes no sense to me
+			break;
+		case 29:
+			// Again, just no idea what the manual means
+			break;
+		case 30:
+			operand = new Word(new BitSet(32));
+			return operand;
+		case 31:
+			BitSet negativeOne = new BitSet(32);
+			for (int i = 0; i < 32; i++) {
+				negativeOne.set(i);
+			}
+			operand = new Word(negativeOne);
+			return operand;
+		default:
 			operand = deuceMemory.getWord(instr.getSource());
 			return operand;
 		}
+		operand = new Word(0);
+		return operand;
 	}
 	
 	public void executeInstruction() throws InterruptedException{
-		int source = this.currentInstruction.getSource();
-		int dest = this.currentInstruction.getDest();
-		int characteristic = this.currentInstruction.getChar();
-		int wait = this.currentInstruction.getWait();
-		int timing = this.currentInstruction.getTiming();
-		int go = this.currentInstruction.getGo();
-		int numberOfExecutions;
-		
 		// Huge nasty switch statement, or at least something which defines the types?
 	
 		switch(currentInstruction.getType()){
@@ -170,22 +159,27 @@ public class Processor {
 	
 	//All examples only involve a Temporary store and a Delay Line, or some function other than just writing...
 	//So I honestly have little confidence in what "long transfers" of read/writes actually did in practice...
+	
 	public void executeTransfer(Instruction instruction){
 			//Maybe this works for our looping concerns?
 			int necessaryTicks = instruction.getTiming() + 2;
 			tickClock();
+			necessaryTicks--;
 			tickClock();
+			necessaryTicks--;
 			for (int i=0; i<instruction.getWait(); i++){
 				tickClock();
 				necessaryTicks--;
 			}
 			for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
-				Word from = this.deuceMemory.getWord(instruction.getSource());
+				Word from = analyseSource(instruction);
 				this.deuceMemory.setWord(instruction.getDest(), from);
+				tickClock();
 				necessaryTicks--;
 			}
 			while (necessaryTicks > 0){
 				tickClock();
+				necessaryTicks--;
 			}
 			
 		}
@@ -193,14 +187,142 @@ public class Processor {
 	
 	public void executeArithmetic(Instruction instruction){	
 		//Get source, check which kind of arithmetic, execute accordingly
+		int necessaryTicks = instruction.getTiming() + 2;
+		tickClock();
+		necessaryTicks--;
+		tickClock();
+		necessaryTicks--;
+		for (int i=0; i<instruction.getWait(); i++){
+			tickClock();
+			necessaryTicks--;
+		}
+		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
+			Word from = analyseSource(instruction);
+			int dest = instruction.getDest();
+			int before;
+			int after;
+			Word newWord;
+			switch(dest){
+			case DeuceConstants.DEST_DOUBLE_SUB:
+				before = deuceMemory.getWord(21).getAsInt();
+				after = (before - from.getAsInt());
+				newWord = new Word(after);	
+				deuceMemory.setWord(21, newWord);
+				break;
+			case DeuceConstants.DEST_DOUBLE_ADD:
+				before = deuceMemory.getWord(21).getAsInt();
+				after = (before + from.getAsInt());
+				newWord = new Word(after);
+				deuceMemory.setWord(21, newWord);
+				break;
+			case DeuceConstants.DEST_SINGLE_ADD:
+				before = deuceMemory.getWord(14).getAsInt();
+				after = (before + from.getAsInt());
+				newWord = new Word(after);
+				deuceMemory.setWord(14, newWord);
+				break;
+			case DeuceConstants.DEST_SINGLE_SUB:
+				before = deuceMemory.getWord(14).getAsInt();
+				after = (before - from.getAsInt());
+				newWord = new Word(after);
+				deuceMemory.setWord(14, newWord);
+				break;
+			}
+			tickClock();
+			necessaryTicks--;
+		}
+		while (necessaryTicks > 0){
+			tickClock();
+			necessaryTicks--;
+		}
 	}
 	
 	public void executeDiscrim(Instruction instruction){
 		//Get source, check which discrimination instruction it is, execute accordingly
+		int necessaryTicks = instruction.getTiming() + 2;
+		tickClock();
+		necessaryTicks--;
+		tickClock();
+		necessaryTicks--;
+		for (int i=0; i<instruction.getWait(); i++){
+			tickClock();
+			necessaryTicks--;
+		}
+		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
+			int dest = instruction.getDest();
+			Word sourceWord = analyseSource(instruction);
+			int toBeChecked = sourceWord.getAsInt();
+			switch(dest){
+			case(DeuceConstants.DEST_DISCRIM_SIGN):
+				if (toBeChecked == Integer.MAX_VALUE){
+					necessaryTicks++;
+				}
+				break;
+			case(DeuceConstants.DEST_DISCRIM_ZERO):
+				if (toBeChecked != 0){
+					necessaryTicks++;
+				}
+				break;
+			}
+			tickClock();
+			necessaryTicks--;
+		}
+		while (necessaryTicks > 0){
+			tickClock();
+			necessaryTicks--;
+		}
 	}
 	
 	public void executeIO(Instruction instruction){
 		//Get source, check which IO instruction it is, execute accordingly
+		int necessaryTicks = instruction.getTiming() + 2;
+		tickClock();
+		necessaryTicks--;
+		tickClock();
+		necessaryTicks--;
+		for (int i=0; i<instruction.getWait(); i++){
+			tickClock();
+			necessaryTicks--;
+		}
+		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
+			Word from = analyseSource(instruction);
+			int dest = instruction.getDest();
+			switch(dest){
+			case(DeuceConstants.DEST_INPUT_OUTPUT):
+				if(instruction.getSource() == 9){
+					//if CardReader.isReading{
+					//   turnoff();
+					//if CardPuncher.isReady(){
+					//   turnoff();
+					//alternatively, turn off all peripherals if we so choose to represent them such
+					break;
+				}
+				else if (instruction.getSource() == 10){
+					//reader.loadDeck(deck); maybe ? 
+					break;
+				}
+				else if (instruction.getSource() == 12){
+					//puncher.start(); or something like that
+					break;
+				}
+				else break;
+			case(DeuceConstants.DEST_PUNCHOUT):
+				System.out.println(from.getAsInt()); //assuming we want decimals punched out?
+				// In the end System I guess we'd be calling some sort of CardPuncher function, giving the source word as an argument?
+				break;
+			case(DeuceConstants.DEST_READ_WRITE):
+				//Mystery Magnetic Store things...
+				break;
+			case(DeuceConstants.DEST_HEADS_MOVE):
+				//More mysterious magnetic store writing/reading heads stuff....
+				break;
+			}
+		}
+		while (necessaryTicks > 0){
+			tickClock();
+			necessaryTicks--;
+		}
+		
 	}
 	
 	
@@ -218,18 +340,13 @@ public class Processor {
 		}
 	}
 	
-	public int readyDelayLine() throws OutOfCardsException{
-		reader.takeInCards();
-		Triad currentTriad = reader.getTriad();
-		int delayLine = currentTriad.getDelayLine();
-		return delayLine;
-	}
-	
 	//Change names 
 	//Read as long as there is another Triad (another while)
 	public void initialInput() throws OutOfCardsException {
-		while(!reader.isEmpty()){
-			int delayLine = readyDelayLine();
+		reader.takeInCards();
+		Triad currentTriad = reader.getTriad();
+		int delayLine = currentTriad.getDelayLine();
+		while(currentTriad != null){
 			Card currentCard = reader.getTriad().getCurrentCard();
 			CardLine currentLine;
 			while (currentCard != null){
@@ -240,10 +357,9 @@ public class Processor {
 					currentLine = currentCard.getNextLine();
 				}
 				currentCard = reader.getTriad().getNext();
+			}
+			reader.takeInCards();
+			currentTriad = reader.getTriad();
 		}
-		
 	}
-	
-	
-
 }

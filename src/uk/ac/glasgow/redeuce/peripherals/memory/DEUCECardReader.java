@@ -1,10 +1,5 @@
 package uk.ac.glasgow.redeuce.peripherals.memory;
 
-import java.util.BitSet;
-
-import uk.ac.glasgow.redeuce.memory.Memory;
-import uk.ac.glasgow.redeuce.memory.Word;
-
 public class DEUCECardReader {
 	FixedCardDeck deck;
 	Triad triad;  //Something to simulate the different states the reader can be in?
@@ -31,6 +26,7 @@ public class DEUCECardReader {
 		} catch (OutOfCardsException e) {
 			e.printStackTrace();
 			this.isEmpty = true;
+			this.triad = null;
 		}
 	}
 	
@@ -40,7 +36,12 @@ public class DEUCECardReader {
 	
 	public void readyNextLine() throws OutOfCardsException{
 		if (currentCard.onLastLine()){
-			this.currentCard = this.triad.getNext();
+			try{
+				this.currentCard = this.triad.getNext();
+			} catch (OutOfCardsException e){
+				this.isEmpty = true;
+				return;
+			}
 		}
 		this.currentLine = currentCard.getNextLine();
 	}

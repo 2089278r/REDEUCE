@@ -43,14 +43,16 @@ public class Triad {
 	}
 	
 	public Card getCurrentCard(){
-		return triad[positionInTriad];
-	}
+		if (positionInTriad > 2){
+			return null;
+		}
+		else return triad[positionInTriad];	}
 
 	public Card getNext() throws OutOfCardsException{
-		if (positionInTriad <= 2){
-			return triad[positionInTriad++];
+		if (positionInTriad > 2){
+			return null;
 		}
-		else return null;
+		else return triad[positionInTriad++];
 	}
 	
 	public boolean onLastCard(){
