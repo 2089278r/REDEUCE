@@ -35,19 +35,5 @@ public class WordTest {
 		String output = testWord.toString();
 		System.out.println(output);
 	}
-	
-	@Test
-	public void otherToStringTest(){
-		Word testWord = new Word(0, 0, 0, 0, 0, 0, 0);
-		String output = testWord.toString();
-		System.out.println(output);
-	}
-	
-	@Test
-	public void humanCodeToStringTest(){
-		Word testWord = new Word (1, 27, 16, 1, 0, 0, 1);
-		String output = testWord.toString();
-		System.out.println(output);
-	}
 }
 

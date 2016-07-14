@@ -12,11 +12,11 @@ public class Memory {
 		for (int i=13; i<=16; i++){
 			linesAndStores[i] = new SingleRegister();
 		}
-		for (int i=17; i<=19; i++){
-			linesAndStores[i] = new DoubleRegister();
-		}
-		for (int i=20; i<=21; i++){
+		for (int i=17; i<=18; i++){
 			linesAndStores[i] = new QuadRegister();
+		}
+		for (int i=19; i<=21; i++){
+			linesAndStores[i] = new DoubleRegister();
 		}
 	}
 	

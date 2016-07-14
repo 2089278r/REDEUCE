@@ -1,5 +1,7 @@
 package uk.ac.glasgow.redeuce.processor;
 
+import java.util.BitSet;
+
 import uk.ac.glasgow.redeuce.DeuceConstants;
 import uk.ac.glasgow.redeuce.memory.Word;
 
@@ -13,6 +15,82 @@ public class Instruction {
 	
 	public Instruction(Word word){
 		this.word = word;
+		this.type = computeType();
+	}
+	
+	public Instruction(int nis, int source, int dest, int characteristic, int wait, int timing, int go){
+		Word makingWord = new Word(new BitSet(32));
+		if (nis <8){
+			String bits = Integer.toBinaryString(nis);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(1 + i);
+				}
+			}
+		}
+		if (source < 32){
+			String bits = Integer.toBinaryString(source);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(4 + i);
+				}
+			}
+		}
+		if (dest < 32){
+			String bits = Integer.toBinaryString(dest);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(9 + i);
+				}
+			}
+		}
+		if (characteristic < 3){
+			String bits = Integer.toBinaryString(characteristic);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(14 + i);
+				}
+			}
+		}
+		if (wait < 32){
+			String bits = Integer.toBinaryString(wait);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(16 + i);
+				}
+			}
+		}
+		if (timing < 32){
+			String bits = Integer.toBinaryString(timing);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(25 + i);
+				}
+			}
+		}
+		if (go < 2){
+			String bits = Integer.toBinaryString(go);
+			bits = new StringBuilder(bits).reverse().toString();
+			char[] bitCharacters = bits.toCharArray();
+			for (int i=0; i<bits.length(); i++){
+				if (bitCharacters[i] == '1'){
+					makingWord.getBinaryDigits().set(31 + i);
+				}
+			}
+		}
+		this.word = makingWord;
 		this.type = computeType();
 	}
 	
