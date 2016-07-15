@@ -29,19 +29,6 @@ public class ProcessorTest {
 		reader.loadDeck(newDeck);
 	}
 	
-	//Making sure the right destination places were printed out; seems like memory is working
-//	@Test
-//	public void readLinesTest() throws OutOfCardsException{
-//		proc.initialInput();
-//		while (!(proc.getCounter() == 0)){
-//			this.proc.tickClock();
-//		}
-//		for (int i=0; i<32; i++){
-//			System.out.println(proc.getCounter() + ": " + proc.getWord(7).getElements(4, 9));
-//			this.proc.tickClock();
-//		}
-//	}
-	
 	@Test
 	public void readsInstructionsTest(){
 		Memory memory = new Memory();
@@ -56,7 +43,12 @@ public class ProcessorTest {
 		bits.set(12);
 		memory.setWord(1, new Word(bits));
 		Instruction instr = new Instruction(memory.getWord(1));
-		//System.out.println(instr.toString());
+		assertTrue(instr.getNIS() == 1);
+		assertTrue(instr.getChar() == 0);
+		assertTrue(instr.getDest() == 13);
+		assertTrue(instr.getWait() == 0);
+		assertTrue(instr.getGo() == 0);
+		assertTrue(instr.getTiming() == 0);
 	}
 	
 	@Test 
@@ -65,8 +57,16 @@ public class ProcessorTest {
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
 		Instruction testArith = new Instruction(0, 27, 25, 0, 0, 0, 0);
 		proc.currentInstruction = testArith;
+		proc.executeArithmetic(testArith);
+		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 1);
+	}
+	
+	@Test
+	public void executeArithmeticTest1() throws InterruptedException{
+		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
+		Instruction testArith = new Instruction(0, 27, 25, 0, 0, 0, 0);
+		proc.currentInstruction = testArith;
 		proc.executeInstruction();
-		System.out.println(proc.deuceMemory.getMicroCycle());
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 1);
 	}
 	
@@ -82,6 +82,19 @@ public class ProcessorTest {
 	}
 	
 	@Test
+	public void ExecuteArithmeticTest2() throws InterruptedException{
+		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
+		proc.deuceMemory.setWord(4, new Word(70));
+		//wait 30 so we can go back to the original place where the word was stored
+		Instruction testArith = new Instruction(0, 4, 25, 0, 30, 0, 0);
+		proc.setCurrentInstruction(testArith);
+		proc.executeInstruction();
+		//proc.tickClock();
+		// HAD TO BE CHANGED, AS TICKS NOW HAPPEN IN EXECUTEINSTRUCTION
+		assertEquals(70, proc.deuceMemory.getWord(13).getAsInt());
+	}
+	
+	@Test
 	public void arithmeticTest3(){
 		assertTrue(proc.deuceMemory.getWord(21).getAsInt() == 0);
 		proc.deuceMemory.setWord(5, new Word(70));
@@ -92,7 +105,181 @@ public class ProcessorTest {
 		assertEquals(70, proc.deuceMemory.getWord(21).getAsInt());
 	}
 	
+	@Test
+	public void executeArithmeticTest3() throws InterruptedException{
+		assertTrue(proc.deuceMemory.getWord(21).getAsInt() == 0);
+		proc.deuceMemory.setWord(5, new Word(70));
+		//wait 30 so we can go back to the original place where the word was stored
+		Instruction testArith = new Instruction(0, 5, 22, 0, 30, 0, 0);
+		proc.setCurrentInstruction(testArith);
+		proc.executeInstruction();
+		// HAD TO BE CHANGED, AS TICKS NOW HAPPEN IN EXECUTEINSTRUCTION
+		assertEquals(70, proc.deuceMemory.getWord(21).getAsInt());
+	}
 	
+	@Test
+	public void singleTransferTest() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		Instruction testTransfer = new Instruction(0, 4, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		while(proc.deuceMemory.getMicroCycle() != 2){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+	}
+	
+	@Test
+	public void singleTransferTestWait() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400)); //(4'4' == 400)
+		Instruction testTransfer = new Instruction(0, 4, 5, 0, 2, 2, 0); //(instruction is move from what's in 4 into 5)
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();                                      
+		assertEquals(6, proc.deuceMemory.getMicroCycle());               //Should be at 4, starting at 0, 2(setup) + 2(wait) and then transfer
+		while(proc.deuceMemory.getMicroCycle() != 4){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());       //Should now be in 5'4'
+	}
+	
+	@Test
+	public void singleTransferTestWaitTime() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		Instruction testTransfer = new Instruction(0, 4, 5, 0, 2, 4, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		assertEquals(8, proc.deuceMemory.getMicroCycle());
+		while(proc.deuceMemory.getMicroCycle() != 4){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+	}
+	
+	@Test
+	public void singleTransferTestBigWait() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		Instruction testTransfer = new Instruction(0, 4, 5, 0, 4, 2, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		assertEquals(6, proc.deuceMemory.getMicroCycle());
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+	}
 	
 
+	@Test
+	public void doubleTransferTest() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(450));
+		Instruction testTransfer = new Instruction(0, 4, 5, 2, 0, 0, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		while(proc.deuceMemory.getMicroCycle() != 2){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+		proc.tickClock();
+		assertEquals(450, proc.deuceMemory.getWord(5).getAsInt());
+	}
+	
+	@Test
+	public void doubleTransferTestWait() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400)); //(4'4' == 400)
+		Instruction testTransfer = new Instruction(0, 4, 5, 2, 2, 2, 0); //(instruction is move from what's in 4 into 5)
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();                                      
+		assertEquals(6, proc.deuceMemory.getMicroCycle());               //Should be at 4, starting at 0, 2(setup) + 2(wait) and then transfer
+		while(proc.deuceMemory.getMicroCycle() != 4){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());       //Should now be in 5'4'
+	}
+	
+	@Test
+	public void doubleTransferTestWaitTime() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		Instruction testTransfer = new Instruction(0, 4, 5, 2, 2, 4, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		assertEquals(8, proc.deuceMemory.getMicroCycle());
+		while(proc.deuceMemory.getMicroCycle() != 4){
+			proc.tickClock();
+		}
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+	}
+	
+	@Test
+	public void doubleTransferTestBigWait() throws InterruptedException {
+		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(4, new Word(400));
+		Instruction testTransfer = new Instruction(0, 4, 5, 2, 4, 2, 0);
+		proc.setCurrentInstruction(testTransfer);
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.executeInstruction();
+		assertEquals(6, proc.deuceMemory.getMicroCycle());
+		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
+	}
+	
 }

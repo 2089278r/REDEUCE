@@ -132,6 +132,7 @@ public class Processor {
 			return operand;
 		default:
 			operand = deuceMemory.getWord(instr.getSource());
+			//System.out.println(operand.getAsInt());
 			return operand;
 		}
 		operand = new Word(0);
@@ -140,9 +141,18 @@ public class Processor {
 	
 	public void executeInstruction() throws InterruptedException{
 		// Huge nasty switch statement, or at least something which defines the types?
+	
+		for (int i=0; i<currentInstruction.getWait(); i++){
+			//System.out.println(deuceMemory.getMicroCycle());
+			tickClock();
+			//necessaryTicks--;
+			//System.out.println(deuceMemory.getMicroCycle());
+		}
 		
+		//setup
 		tickClock();
 		tickClock();
+	
 		switch(currentInstruction.getType()){
 			case ARITHMETIC:
 				executeArithmetic(currentInstruction);
@@ -168,40 +178,33 @@ public class Processor {
 	
 	public void executeTransfer(Instruction instruction){
 			//Maybe this works for our looping concerns?
-			int necessaryTicks = instruction.getTiming() + 2;
-			//tickClock();
-			necessaryTicks--;
-			//tickClock();
-			necessaryTicks--;
-			for (int i=0; i<instruction.getWait(); i++){
-				tickClock();
-				necessaryTicks--;
+			int necessaryTicks;
+			necessaryTicks = instruction.getTiming() - instruction.getWait() + 2;
+			if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
+				necessaryTicks += 32;
 			}
 			for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 				Word from = analyseSource(instruction);
 				this.deuceMemory.setWord(instruction.getDest(), from);
-				tickClock();
-				necessaryTicks--;
+				if(necessaryTicks != 0){
+					tickClock();
+					necessaryTicks--;
+				}
 			}
 			while (necessaryTicks > 0){
 				tickClock();
 				necessaryTicks--;
 			}
-			
 		}
 	
 	
 	public void executeArithmetic(Instruction instruction){	
 		//Get source, check which kind of arithmetic, execute accordingly
-		int necessaryTicks = instruction.getTiming() + 2;
+		int necessaryTicks = instruction.getTiming();
 		//tickClock();
 		necessaryTicks--;
 		//tickClock();
 		necessaryTicks--;
-		for (int i=0; i<instruction.getWait(); i++){
-			tickClock();
-			necessaryTicks--;
-		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
 			int dest = instruction.getDest();
@@ -235,6 +238,7 @@ public class Processor {
 				break;
 			}
 		}
+		
 		while (necessaryTicks > 0){
 			tickClock();
 			necessaryTicks--;
@@ -243,15 +247,11 @@ public class Processor {
 	
 	public void executeDiscrim(Instruction instruction){
 		//Get source, check which discrimination instruction it is, execute accordingly
-		int necessaryTicks = instruction.getTiming() + 2;
+		int necessaryTicks = instruction.getTiming();
 		//tickClock();
 		necessaryTicks--;
 		//tickClock();
 		necessaryTicks--;
-		for (int i=0; i<instruction.getWait(); i++){
-			tickClock();
-			necessaryTicks--;
-		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			int dest = instruction.getDest();
 			Word sourceWord = analyseSource(instruction);
@@ -282,12 +282,9 @@ public class Processor {
 		necessaryTicks--;
 		//tickClock();
 		necessaryTicks--;
-		for (int i=0; i<instruction.getWait(); i++){
-			tickClock();
-			necessaryTicks--;
-		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
+			System.out.println(from.getAsInt());
 			int dest = instruction.getDest();
 			switch(dest){
 			case(DeuceConstants.DEST_INPUT_OUTPUT):
@@ -330,7 +327,9 @@ public class Processor {
 	
 	//A function for the execution instructions to run to see how many times they need to repeat.
 	//Not yet tested, but it seems like it'd solve our Characteristic problem perhaps?
+	
 	public int getNumberOfExecutions(Instruction instr){
+		
 		if (instr.getChar() == 2){
 			return 2;
 		}
@@ -342,8 +341,6 @@ public class Processor {
 		}
 	}
 	
-	//Change names 
-	//Read as long as there is another Triad (another while)
 	public void initialInput() throws OutOfCardsException {
 		reader.takeInCards();
 		Triad currentTriad = reader.getTriad();
