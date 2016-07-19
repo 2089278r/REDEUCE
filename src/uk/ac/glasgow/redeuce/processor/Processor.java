@@ -21,6 +21,7 @@ public class Processor {
 	int currentDelayLine; //Just for testing afaik
 	boolean go;
 	Memory deuceMemory; //For testing purposes I suppose? I guess we'll have a large object later where the processor can just read memory?
+	boolean tcb;
 	
 	public Processor(DEUCECardReader reader, Memory deuceMemory){
 		this.reader = reader;
@@ -132,7 +133,6 @@ public class Processor {
 			return operand;
 		default:
 			operand = deuceMemory.getWord(instr.getSource());
-			//System.out.println(operand.getAsInt());
 			return operand;
 		}
 		operand = new Word(0);
@@ -143,15 +143,15 @@ public class Processor {
 		// Huge nasty switch statement, or at least something which defines the types?
 	
 		for (int i=0; i<currentInstruction.getWait(); i++){
-			//System.out.println(deuceMemory.getMicroCycle());
 			tickClock();
-			//necessaryTicks--;
-			//System.out.println(deuceMemory.getMicroCycle());
+			//System.out.println("ticked" + deuceMemory.getMicroCycle());
 		}
 		
 		//setup
 		tickClock();
+		//System.out.println("ticked" + deuceMemory.getMicroCycle());
 		tickClock();
+		//System.out.println("ticked" + deuceMemory.getMicroCycle());
 	
 		switch(currentInstruction.getType()){
 			case ARITHMETIC:
@@ -179,10 +179,14 @@ public class Processor {
 	public void executeTransfer(Instruction instruction){
 			//Maybe this works for our looping concerns?
 			int necessaryTicks;
-			necessaryTicks = instruction.getTiming() - instruction.getWait() + 2;
 			if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
-				necessaryTicks += 32;
+				necessaryTicks = instruction.getTiming() + 32;
+				System.out.println("did this");
 			}
+			else {
+				necessaryTicks = instruction.getTiming();
+			}
+			necessaryTicks -= instruction.getWait();
 			for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 				Word from = analyseSource(instruction);
 				this.deuceMemory.setWord(instruction.getDest(), from);
@@ -192,19 +196,22 @@ public class Processor {
 				}
 			}
 			while (necessaryTicks > 0){
+				//System.out.println(necessaryTicks);
 				tickClock();
 				necessaryTicks--;
 			}
+			//System.out.println(deuceMemory.getMicroCycle());
+
 		}
 	
 	
 	public void executeArithmetic(Instruction instruction){	
 		//Get source, check which kind of arithmetic, execute accordingly
-		int necessaryTicks = instruction.getTiming();
-		//tickClock();
-		necessaryTicks--;
-		//tickClock();
-		necessaryTicks--;
+		int necessaryTicks;
+		necessaryTicks = instruction.getTiming();
+		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
+			necessaryTicks += 32;
+		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
 			int dest = instruction.getDest();
@@ -212,29 +219,46 @@ public class Processor {
 			int after;
 			Word newWord;
 			switch(dest){
+			//DOUBLE ADD and DOUBLE SUB will need to be implemented with the TCB in mind... will rework when discussed!
 			case DeuceConstants.DEST_DOUBLE_SUB:
 				before = deuceMemory.getWord(21).getAsInt();
 				after = (before - from.getAsInt());
 				newWord = new Word(after);	
 				deuceMemory.setWord(21, newWord);
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			case DeuceConstants.DEST_DOUBLE_ADD:
 				before = deuceMemory.getWord(21).getAsInt();
 				after = (before + from.getAsInt());
 				newWord = new Word(after);
 				deuceMemory.setWord(21, newWord);
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			case DeuceConstants.DEST_SINGLE_ADD:
 				before = deuceMemory.getWord(13).getAsInt();
 				after = (before + from.getAsInt());
 				newWord = new Word(after);
 				deuceMemory.setWord(13, newWord);
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			case DeuceConstants.DEST_SINGLE_SUB:
 				before = deuceMemory.getWord(13).getAsInt();
 				after = (before - from.getAsInt());
 				newWord = new Word(after);
-				deuceMemory.setWord(14, newWord);
+				deuceMemory.setWord(13, newWord);
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			}
 		}
@@ -247,11 +271,12 @@ public class Processor {
 	
 	public void executeDiscrim(Instruction instruction){
 		//Get source, check which discrimination instruction it is, execute accordingly
-		int necessaryTicks = instruction.getTiming();
-		//tickClock();
-		necessaryTicks--;
-		//tickClock();
-		necessaryTicks--;
+		int necessaryTicks;
+		necessaryTicks = instruction.getTiming();
+		//System.out.println(deuceMemory.getMicroCycle());
+		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
+			necessaryTicks += 32;
+		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			int dest = instruction.getDest();
 			Word sourceWord = analyseSource(instruction);
@@ -259,12 +284,26 @@ public class Processor {
 			switch(dest){
 			case(DeuceConstants.DEST_DISCRIM_SIGN):
 				if (toBeChecked == Integer.MAX_VALUE){
-					necessaryTicks++;
+					tickClock();
+				}
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
 				}
 				break;
 			case(DeuceConstants.DEST_DISCRIM_ZERO):
 				if (toBeChecked != 0){
-					necessaryTicks++;
+					tickClock();
+					
+					//System.out.println(deuceMemory.getMicroCycle() + " with this many ticks left: " + necessaryTicks);
+				}
+				//else{
+					//System.out.println("0 this time");
+					//System.out.println(deuceMemory.getMicroCycle() + " with this many ticks left: " + necessaryTicks);
+				//}
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
 				}
 				break;
 			}
@@ -277,14 +316,14 @@ public class Processor {
 	
 	public void executeIO(Instruction instruction){
 		//Get source, check which IO instruction it is, execute accordingly
-		int necessaryTicks = instruction.getTiming() + 2;
-		//tickClock();
-		necessaryTicks--;
-		//tickClock();
-		necessaryTicks--;
+		int necessaryTicks;
+		necessaryTicks = instruction.getTiming() - 2;
+		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
+			necessaryTicks += 32;
+		}
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
-			System.out.println(from.getAsInt());
+			//System.out.println(from.getAsInt());
 			int dest = instruction.getDest();
 			switch(dest){
 			case(DeuceConstants.DEST_INPUT_OUTPUT):
@@ -294,26 +333,56 @@ public class Processor {
 					//if CardPuncher.isReady(){
 					//   turnoff();
 					//alternatively, turn off all peripherals if we so choose to represent them such
+					if(necessaryTicks > 0){
+						tickClock();
+						necessaryTicks--;
+					}
 					break;
 				}
 				else if (instruction.getSource() == 10){
 					//reader.loadDeck(deck); maybe ? 
+					if(necessaryTicks > 0){
+						tickClock();
+						necessaryTicks--;
+					}
 					break;
 				}
 				else if (instruction.getSource() == 12){
 					//puncher.start(); or something like that
+					if(necessaryTicks > 0){
+						tickClock();
+						necessaryTicks--;
+					}
 					break;
 				}
-				else break;
+				else {
+					if(necessaryTicks > 0){
+						tickClock();
+						necessaryTicks--;
+					}
+					break;
+				}
 			case(DeuceConstants.DEST_PUNCHOUT):
 				System.out.println(from.getAsInt()); //assuming we want decimals punched out?
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				// In the end System I guess we'd be calling some sort of CardPuncher function, giving the source word as an argument?
 				break;
 			case(DeuceConstants.DEST_READ_WRITE):
 				//Mystery Magnetic Store things...
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			case(DeuceConstants.DEST_HEADS_MOVE):
 				//More mysterious magnetic store writing/reading heads stuff....
+				if(necessaryTicks > 0){
+					tickClock();
+					necessaryTicks--;
+				}
 				break;
 			}
 		}
@@ -360,6 +429,14 @@ public class Processor {
 			reader.takeInCards();
 			currentTriad = reader.getTriad();
 		}
+	}
+	
+	public void settcb(){
+		this.tcb = true;
+	}
+	
+	public void offtcb(){
+		this.tcb = false;
 	}
 	
 	public void step() throws InterruptedException{

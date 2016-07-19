@@ -1,0 +1,15 @@
+Commands:
+
+InitialIN:
+	- Calls the InitialInput() method in Processor
+
+OpenDECK:
+	- Creates a DEUCECardReader class and then calls its loadDeck(FixedCardDeck deck) function, with the user's object passed in as the deck.
+	- (Or maybe just calls the DEUCECardReader constructor which takes a deck as an argument?) 
+	
+LoadFile: 
+	- Makes CRDFileReader, reads in and creates deck and then creates said ddeck.
+	
+
+
+
