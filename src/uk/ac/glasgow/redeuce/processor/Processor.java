@@ -438,12 +438,6 @@ public class Processor {
 	
 	public void step() throws InterruptedException{
 		executeInstruction();
-		
-		//Added this here for testing; should NOT be in final!
-		
-		if (this.currentInstruction.getGo() == 1){
-			return;
-		}
 		getNextInstruction();
 	}
 }

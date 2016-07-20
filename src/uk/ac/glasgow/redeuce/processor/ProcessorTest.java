@@ -605,5 +605,76 @@ public class ProcessorTest {
 			proc.step();
 		}
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
-	}	
+	}
+	
+	@Test
+	public void primeNumbersBigTest() throws InterruptedException{
+		Word word1 = new Instruction(1, 27, 13, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word1);      //mc 0
+		proc.tickClock();
+		proc.tickClock();
+		Word word2 = new Instruction(1, 27, 25, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word2);      //mc 2
+		proc.tickClock();
+		proc.tickClock();
+		Word word3 = new Instruction(1, 13, 14, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word3);      //mc 4
+		proc.tickClock();
+		proc.tickClock();
+		Word word4 = new Instruction(1, 27, 15, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word4);      //mc 6
+		proc.tickClock();
+		proc.tickClock();
+		Word word5 = new Instruction(1, 27, 16, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word5);      //mc 8
+		proc.tickClock();
+		proc.tickClock();
+		
+		//LOOP
+		Word word6 = new Instruction(1, 16, 29, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word6);      //mc 10
+		proc.tickClock();
+		
+		//Should end up here, mc11, after as many squares as possible given a 32-bit word are printed
+		Word finalWord = new Instruction (1, DeuceConstants.SOURCE_CONSTANT_NEGATIVE, DeuceConstants.DEST_PUNCHOUT, 0, 0, 0, 1).getAsWord();
+		proc.deuceMemory.setWord(1, finalWord);
+		proc.tickClock();
+		////////////////////////
+		
+		Word word7 = new Instruction(1, 14, 13, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word7);      //mc 12
+		proc.tickClock();
+		proc.tickClock();
+		Word word8 = new Instruction(1, 15, 25, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word8);      //mc 14
+		proc.tickClock();
+		proc.tickClock();
+		Word word9 = new Instruction(1, 13, 15, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word9);      //mc 16
+		proc.tickClock();
+		proc.tickClock();
+		Word word10 = new Instruction(1, 16, 25, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word10);      //mc 18
+		proc.tickClock();
+		proc.tickClock();
+		Word word11 = new Instruction(1, 13, 16, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word11);      //mc 20
+		proc.tickClock();
+		proc.tickClock();
+		Word word12 = new Instruction(1, 13, DeuceConstants.DEST_DISCRIM_SIGN, 0, 0, 18, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word12);      //mc 22
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.setCurrentInstruction(new Instruction(word1));
+		while(true){
+			proc.step();
+			if(proc.currentInstruction.getGo() == 1){
+				proc.step();
+				assertTrue(true);
+				System.out.println("yaaaaaay!");
+				break;
+			}
+		}
+	}
 }
