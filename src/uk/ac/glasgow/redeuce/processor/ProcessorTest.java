@@ -576,7 +576,6 @@ public class ProcessorTest {
 		}
 		proc.setCurrentInstruction(new Instruction(word));
 		for (int i=0; i<10; i++){
-			System.out.println(proc.currentInstruction.toString());
 			proc.step();
 		}
 	}
@@ -608,7 +607,7 @@ public class ProcessorTest {
 	}
 	
 	@Test
-	public void primeNumbersBigTest() throws InterruptedException{
+	public void perfectSquaresBigTest() throws InterruptedException{
 		Word word1 = new Instruction(1, 27, 13, 0, 0, 0, 0).getAsWord();
 		proc.deuceMemory.setWord(1, word1);      //mc 0
 		proc.tickClock();

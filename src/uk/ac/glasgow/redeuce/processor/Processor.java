@@ -224,41 +224,30 @@ public class Processor {
 				after = (before - from.getAsInt());
 				newWord = new Word(after);	
 				deuceMemory.setWord(21, newWord);
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
 			case DeuceConstants.DEST_DOUBLE_ADD:
 				before = deuceMemory.getWord(21).getAsInt();
 				after = (before + from.getAsInt());
 				newWord = new Word(after);
 				deuceMemory.setWord(21, newWord);
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
 			case DeuceConstants.DEST_SINGLE_ADD:
 				before = deuceMemory.getWord(13).getAsInt();
 				after = (before + from.getAsInt());
 				newWord = new Word(after);
 				deuceMemory.setWord(13, newWord);
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
 			case DeuceConstants.DEST_SINGLE_SUB:
 				before = deuceMemory.getWord(13).getAsInt();
 				after = (before - from.getAsInt());
 				newWord = new Word(after);
 				deuceMemory.setWord(13, newWord);
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
+			}
+				
+			if(necessaryTicks > 0){
+				tickClock();
+				necessaryTicks--;
 			}
 		}
 		
@@ -287,20 +276,16 @@ public class Processor {
 				if (toBeChecked == Integer.MAX_VALUE){
 					necessaryTicks++;
 				}
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
 			case(DeuceConstants.DEST_DISCRIM_ZERO):
 				if (toBeChecked != 0){
 					necessaryTicks++;
 				}
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
+			}
+			if(necessaryTicks > 0){
+				tickClock();
+				necessaryTicks--;
 			}
 		}
 		while (necessaryTicks > 0){
@@ -330,57 +315,33 @@ public class Processor {
 					//if CardPuncher.isReady(){
 					//   turnoff();
 					//alternatively, turn off all peripherals if we so choose to represent them such
-					if(necessaryTicks > 0){
-						tickClock();
-						necessaryTicks--;
-					}
 					break;
 				}
 				else if (instruction.getSource() == 10){
 					//reader.loadDeck(deck); maybe ? 
-					if(necessaryTicks > 0){
-						tickClock();
-						necessaryTicks--;
-					}
 					break;
 				}
 				else if (instruction.getSource() == 12){
 					//puncher.start(); or something like that
-					if(necessaryTicks > 0){
-						tickClock();
-						necessaryTicks--;
-					}
 					break;
 				}
 				else {
-					if(necessaryTicks > 0){
-						tickClock();
-						necessaryTicks--;
-					}
 					break;
 				}
 			case(DeuceConstants.DEST_PUNCHOUT):
 				System.out.println(from.getAsInt()); //assuming we want decimals punched out?
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				// In the end System I guess we'd be calling some sort of CardPuncher function, giving the source word as an argument?
 				break;
 			case(DeuceConstants.DEST_READ_WRITE):
 				//Mystery Magnetic Store things...
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
 			case(DeuceConstants.DEST_HEADS_MOVE):
 				//More mysterious magnetic store writing/reading heads stuff....
-				if(necessaryTicks > 0){
-					tickClock();
-					necessaryTicks--;
-				}
 				break;
+			}
+			if(necessaryTicks > 0){
+				tickClock();
+				necessaryTicks--;
 			}
 		}
 		while (necessaryTicks > 0){
