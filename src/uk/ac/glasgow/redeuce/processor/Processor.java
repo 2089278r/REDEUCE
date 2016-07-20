@@ -46,7 +46,7 @@ public class Processor {
 	
 	public void getNextInstruction(){
 		 int nextDelayLine = currentInstruction.getNIS();
-		 this.currentInstruction = new Instruction(deuceMemory.getWord(nextDelayLine)); //To keep track of where we are (maybe just for testing...)
+		 this.currentInstruction = new Instruction(deuceMemory.getWord(nextDelayLine));
 	}
 	
 	public void setCurrentInstruction(Instruction instruction){
@@ -144,7 +144,6 @@ public class Processor {
 	
 		for (int i=0; i<currentInstruction.getWait(); i++){
 			tickClock();
-			//System.out.println("ticked" + deuceMemory.getMicroCycle());
 		}
 		
 		//setup
@@ -181,7 +180,6 @@ public class Processor {
 			int necessaryTicks;
 			if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
 				necessaryTicks = instruction.getTiming() + 32;
-				System.out.println("did this");
 			}
 			else {
 				necessaryTicks = instruction.getTiming();
@@ -196,11 +194,9 @@ public class Processor {
 				}
 			}
 			while (necessaryTicks > 0){
-				//System.out.println(necessaryTicks);
 				tickClock();
 				necessaryTicks--;
 			}
-			//System.out.println(deuceMemory.getMicroCycle());
 
 		}
 	
@@ -208,10 +204,13 @@ public class Processor {
 	public void executeArithmetic(Instruction instruction){	
 		//Get source, check which kind of arithmetic, execute accordingly
 		int necessaryTicks;
-		necessaryTicks = instruction.getTiming();
 		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
-			necessaryTicks += 32;
+			necessaryTicks = instruction.getTiming() + 32;
 		}
+		else {
+			necessaryTicks = instruction.getTiming();
+		}
+		necessaryTicks -= instruction.getWait();
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
 			int dest = instruction.getDest();
@@ -272,11 +271,13 @@ public class Processor {
 	public void executeDiscrim(Instruction instruction){
 		//Get source, check which discrimination instruction it is, execute accordingly
 		int necessaryTicks;
-		necessaryTicks = instruction.getTiming();
-		//System.out.println(deuceMemory.getMicroCycle());
 		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
-			necessaryTicks += 32;
+			necessaryTicks = instruction.getTiming() + 32;
 		}
+		else {
+			necessaryTicks = instruction.getTiming();
+		}
+		necessaryTicks -= instruction.getWait();
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			int dest = instruction.getDest();
 			Word sourceWord = analyseSource(instruction);
@@ -284,7 +285,7 @@ public class Processor {
 			switch(dest){
 			case(DeuceConstants.DEST_DISCRIM_SIGN):
 				if (toBeChecked == Integer.MAX_VALUE){
-					tickClock();
+					necessaryTicks++;
 				}
 				if(necessaryTicks > 0){
 					tickClock();
@@ -293,14 +294,8 @@ public class Processor {
 				break;
 			case(DeuceConstants.DEST_DISCRIM_ZERO):
 				if (toBeChecked != 0){
-					tickClock();
-					
-					//System.out.println(deuceMemory.getMicroCycle() + " with this many ticks left: " + necessaryTicks);
+					necessaryTicks++;
 				}
-				//else{
-					//System.out.println("0 this time");
-					//System.out.println(deuceMemory.getMicroCycle() + " with this many ticks left: " + necessaryTicks);
-				//}
 				if(necessaryTicks > 0){
 					tickClock();
 					necessaryTicks--;
@@ -317,13 +312,15 @@ public class Processor {
 	public void executeIO(Instruction instruction){
 		//Get source, check which IO instruction it is, execute accordingly
 		int necessaryTicks;
-		necessaryTicks = instruction.getTiming() - 2;
 		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
-			necessaryTicks += 32;
+			necessaryTicks = instruction.getTiming() + 32;
 		}
+		else {
+			necessaryTicks = instruction.getTiming();
+		}
+		necessaryTicks -= instruction.getWait();
 		for (int i=0; i<(getNumberOfExecutions(instruction)) ; i++){
 			Word from = analyseSource(instruction);
-			//System.out.println(from.getAsInt());
 			int dest = instruction.getDest();
 			switch(dest){
 			case(DeuceConstants.DEST_INPUT_OUTPUT):
@@ -441,6 +438,12 @@ public class Processor {
 	
 	public void step() throws InterruptedException{
 		executeInstruction();
+		
+		//Added this here for testing; should NOT be in final!
+		
+		if (this.currentInstruction.getGo() == 1){
+			return;
+		}
 		getNextInstruction();
 	}
 }

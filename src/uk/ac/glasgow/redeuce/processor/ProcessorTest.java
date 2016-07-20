@@ -204,6 +204,8 @@ public class ProcessorTest {
 	}
 	
 	//Tests that a double transfer happens correctly in the most basic case
+	// NOTE: Actually not as basic because a double transfer will be different when T=W
+	// SECOND NOTE: Actually, it still works fine
 	@Test
 	public void doubleTransferTest() throws InterruptedException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
@@ -218,9 +220,9 @@ public class ProcessorTest {
 			proc.tickClock();
 		}
 		proc.executeInstruction();
-		while(proc.deuceMemory.getMicroCycle() != 2){
-			proc.tickClock();
-		}
+//		while(proc.deuceMemory.getMicroCycle() != 2){
+//			proc.tickClock();
+//		}
 		assertEquals(400, proc.deuceMemory.getWord(5).getAsInt());
 		proc.tickClock();
 		assertEquals(450, proc.deuceMemory.getWord(5).getAsInt());
@@ -416,8 +418,9 @@ public class ProcessorTest {
 		assertEquals(2, proc.deuceMemory.getMicroCycle());
 	}
 	
+	//Test that when the word is not 0, there is a delay of 1 additional timing, but not in the case that it is equal to 0
 	@Test
-	public void discrimTestWithWait() throws InterruptedException {
+	public void discrimTestWithTiming() throws InterruptedException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(1));
@@ -442,7 +445,165 @@ public class ProcessorTest {
 		assertEquals(4, proc.deuceMemory.getMicroCycle());
 	}
 	
+	//Test to see if two subsequent words that need to be checked for discrim instructions can be done.
+	//Works, but should be noted that I have no idea if this is how it's intended to work...
+	@Test
+	public void discrimTestDouble() throws InterruptedException {
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(1));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(1));
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		Instruction discrimInstr = new Instruction(2, 2, DeuceConstants.DEST_DISCRIM_ZERO, 2, 0, 2, 0);
+		proc.setCurrentInstruction(discrimInstr);
+		proc.executeInstruction();
+		assertEquals(6, proc.deuceMemory.getMicroCycle());
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(0));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(0));
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.setCurrentInstruction(discrimInstr);
+		proc.executeInstruction();
+		assertEquals(4, proc.deuceMemory.getMicroCycle());
+	}
+	
+	//Test that the other discrim instruction also works in some capacity
+	@Test
+	public void discrimNegativeTest() throws InterruptedException{
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(Integer.MAX_VALUE));
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		Instruction discrimInstr = new Instruction(2, 2, DeuceConstants.DEST_DISCRIM_SIGN, 2, 0, 2, 0);
+		proc.setCurrentInstruction(discrimInstr);
+		proc.executeInstruction();
+		assertEquals(5, proc.deuceMemory.getMicroCycle());
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(100000));
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.setCurrentInstruction(discrimInstr);
+		proc.executeInstruction();
+		assertEquals(4, proc.deuceMemory.getMicroCycle());
+	}
+	
+	//Test to see that IO instructions are working in some manner, leading to System.outs
+	@Test
+	public void ioTestPrintOut() throws InterruptedException{
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(500));
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		Instruction ioInstr = new Instruction(2, 2, DeuceConstants.DEST_PUNCHOUT, 0, 0, 0, 0);
+		proc.setCurrentInstruction(ioInstr);
+		proc.executeInstruction();
+		assertEquals(2, proc.deuceMemory.getMicroCycle());
+	}
+	
+	//Test to see that a long characteristic can be used to print out multiple lines in a DL correctly
+	@Test
+	public void ioTestLongPrintOut() throws InterruptedException{
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(500));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(505));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(510));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(515));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(520));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(525));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(530));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(535));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(540));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(545));
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, new Word(550));
+		
+		while(proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		Instruction ioInstr = new Instruction(2, 2, DeuceConstants.DEST_PUNCHOUT, 1, 0, 10, 0);
+		proc.setCurrentInstruction(ioInstr);
+		proc.executeInstruction();
+		assertEquals(12, proc.deuceMemory.getMicroCycle());
+	}
+	
+	//The other IO instructions are not really going to be used, or at least have no implementations yet, so I'm unsure as to how testing them should go...
 	
 	
+	//Tests that the correct next instruction is retrieved after executing another
+	@Test
+	public void nextInstrTest() throws InterruptedException{
+		Word word = new Instruction(2, DeuceConstants.SOURCE_CONSTANT_ONE, 13, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(1, word);
+		proc.tickClock();
+		proc.tickClock();
+		Word nextWord = new Instruction(3, DeuceConstants.SOURCE_CONSTANT_ONE, DeuceConstants.DEST_SINGLE_ADD, 0, 0, 0, 0).getAsWord();
+		proc.deuceMemory.setWord(2, nextWord);
+		proc.tickClock();
+		proc.tickClock();
+		Word thirdWord = new Instruction (1, 13, DeuceConstants.DEST_PUNCHOUT, 0, 0, 26, 0).getAsWord();
+		proc.deuceMemory.setWord(3, thirdWord);
+		while (proc.deuceMemory.getMicroCycle() != 0){
+			proc.tickClock();
+		}
+		proc.setCurrentInstruction(new Instruction(word));
+		for (int i=0; i<10; i++){
+			System.out.println(proc.currentInstruction.toString());
+			proc.step();
+		}
+	}
 	
+	@Test
+	public void simpleLoopTest() throws InterruptedException{
+		proc.deuceMemory.setWord(13, new Word(5));
+		Word word1 = new Instruction (3, 27, 26, 0, 0, 0, 0).getAsWord();
+		Word word2 = new Instruction (2, 13, DeuceConstants.DEST_PUNCHOUT, 0, 0, 0, 0).getAsWord();
+		Word word3 = new Instruction (1, 13, DeuceConstants.DEST_DISCRIM_ZERO, 0, 0, 25, 0).getAsWord();
+		Word word4 = new Instruction (1, DeuceConstants.SOURCE_CONSTANT_NEGATIVE, DeuceConstants.DEST_PUNCHOUT, 0, 0, 0, 1).getAsWord();
+		proc.deuceMemory.setWord(1, word2);
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(2, word1);
+		proc.tickClock();
+		proc.tickClock();
+		proc.deuceMemory.setWord(3, word3);
+		while (proc.deuceMemory.getMicroCycle() != 31){
+			proc.tickClock();
+		}
+		proc.deuceMemory.setWord(1, word4);
+		proc.tickClock();
+		proc.setCurrentInstruction(new Instruction(word2));
+		for (int i=0; i<16; i++){
+			proc.step();
+		}
+		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
+	}	
 }

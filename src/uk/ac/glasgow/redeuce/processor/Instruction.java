@@ -144,6 +144,10 @@ public class Instruction {
 		return this.type;
 	}
 	
+	public Word getAsWord(){
+		return this.word;
+	}
+	
 	public String toString(){
 		String output = "Next instruction is at delay line: " + getNIS() + "\n"
 						+ "Source Word: " + getSource() + "\n"
