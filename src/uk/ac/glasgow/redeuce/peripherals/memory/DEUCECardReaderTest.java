@@ -15,8 +15,9 @@ public class DEUCECardReaderTest {
 		FixedCardDeck newDeck = testReader.createNewDeck();
 		DEUCECardReader reader = new DEUCECardReader();
 		reader.loadDeck(newDeck);
-		int delayLine = reader.getTriad().delayLine;
-		assertTrue(delayLine == 8);
+		reader.takeInCards();
+		int delayLine = reader.getTriad().getDelayLine();
+		assertEquals(delayLine, 7);
 	}
 	
 	@Test
