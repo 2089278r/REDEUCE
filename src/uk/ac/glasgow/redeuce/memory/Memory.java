@@ -37,4 +37,21 @@ public class Memory {
 	public void setWord(int toDelayLine, Word word){
 		linesAndStores[toDelayLine].write(word);
 	}
+	
+	public String toString(){
+		String output = "";
+		for (int i=13; i<=16; i++){
+			output += linesAndStores[i].toString() + "\n";
+		}
+		return output;
+	}
+	
+	//Method to return contents in a delay line for the Displays
+	public String outputDelayLine(int delayLine){
+		String delayStore = "";
+		for (int i=0; i<32; i++){
+			delayStore += linesAndStores[delayLine].contents[i].toString() + "\n";
+		}
+		return delayStore;
+	}
 }

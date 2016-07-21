@@ -1,5 +1,6 @@
 package uk.ac.glasgow.redeuce.processor;
 
+import java.io.IOException;
 import java.util.BitSet;
 
 import uk.ac.glasgow.redeuce.DeuceConstants;
@@ -7,7 +8,9 @@ import uk.ac.glasgow.redeuce.memory.Memory;
 import uk.ac.glasgow.redeuce.memory.Word;
 import uk.ac.glasgow.redeuce.peripherals.memory.Card;
 import uk.ac.glasgow.redeuce.peripherals.memory.CardLine;
+import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardPuncher;
 import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardReader;
+import uk.ac.glasgow.redeuce.peripherals.memory.FixedCardDeck;
 import uk.ac.glasgow.redeuce.peripherals.memory.OutOfCardsException;
 import uk.ac.glasgow.redeuce.peripherals.memory.Triad;
 
@@ -17,19 +20,39 @@ import uk.ac.glasgow.redeuce.peripherals.memory.Triad;
 public class Processor {
 	
 	Instruction currentInstruction;
+	DEUCECardPuncher puncher;
 	DEUCECardReader reader;
-	int currentDelayLine; //Just for testing afaik
 	boolean go;
 	Memory deuceMemory; //For testing purposes I suppose? I guess we'll have a large object later where the processor can just read memory?
 	boolean tcb;
 	
-	public Processor(DEUCECardReader reader, Memory deuceMemory){
+	public Processor(){
+		this.reader = new DEUCECardReader();
+		this.deuceMemory = new Memory();
+		this.puncher = new DEUCECardPuncher();
+	}
+	
+	public Processor(DEUCECardReader reader, Memory deuceMemory, DEUCECardPuncher puncher) throws IOException{
 		this.reader = reader;
 		this.go = true;
 		this.deuceMemory = deuceMemory;
+		this.puncher = puncher;
+		puncher.turnOn(); //JUST FOR TESTING SO AS TO NOT REWRITE ALL TESTS
+	}
+	
+	public void turnOnPunch() throws IOException{
+		this.puncher.turnOn();
 	}
 	public void tickClock(){
 		deuceMemory.increment();
+	}
+	
+	public Memory getMemory(){
+		return this.deuceMemory;
+	}
+	
+	public void cardLoad(FixedCardDeck deck){
+		this.reader.loadDeck(deck);
 	}
 	
 	public int getCounter(){
@@ -88,7 +111,7 @@ public class Processor {
 			return operand;
 		case DeuceConstants.SOURCE_STORE_DOUBLED:
 			newWordBits = new BitSet();
-			oldWord = deuceMemory.getWord(21).getBits();
+			oldWord = deuceMemory.getWord(14).getBits();
 			// Not really just a "move right" operation, sadly... I hope this'll
 			// do?
 			for (int i = 1; i <= oldWord.length(); i++) {
@@ -139,7 +162,7 @@ public class Processor {
 		return operand;
 	}
 	
-	public void executeInstruction() throws InterruptedException{
+	public void executeInstruction() throws InterruptedException, IOException{
 		// Huge nasty switch statement, or at least something which defines the types?
 	
 		for (int i=0; i<currentInstruction.getWait(); i++){
@@ -294,7 +317,7 @@ public class Processor {
 		}
 	}
 	
-	public void executeIO(Instruction instruction){
+	public void executeIO(Instruction instruction) throws IOException{
 		//Get source, check which IO instruction it is, execute accordingly
 		int necessaryTicks;
 		if (((instruction.getWait() > instruction.getTiming()) || ((instruction.getWait() == instruction.getTiming()) && (instruction.getChar() == 2)))){
@@ -322,14 +345,16 @@ public class Processor {
 					break;
 				}
 				else if (instruction.getSource() == 12){
-					//puncher.start(); or something like that
+					this.puncher.turnOn();
 					break;
 				}
 				else {
 					break;
 				}
 			case(DeuceConstants.DEST_PUNCHOUT):
-				System.out.println(from.getAsInt()); //assuming we want decimals punched out?
+				//System.out.println(from.getAsInt()); //assuming we want decimals punched out?
+				int decimalNumber = from.getAsInt();
+				puncher.punch(Integer.toString(decimalNumber));
 				// In the end System I guess we'd be calling some sort of CardPuncher function, giving the source word as an argument?
 				break;
 			case(DeuceConstants.DEST_READ_WRITE):
@@ -386,18 +411,21 @@ public class Processor {
 			}
 			reader.takeInCards();
 			currentTriad = reader.getTriad();
+			
+			//This can be kept if we decide to not make the initial input function more 'real', or we can just have this as a set rule?
+			//It is used for now for testing purposes.
+			setCurrentInstruction(new Instruction(deuceMemory.getWord(1)));
 		}
 	}
 	
 	public void settcb(){
 		this.tcb = true;
 	}
-	
 	public void offtcb(){
 		this.tcb = false;
 	}
 	
-	public void step() throws InterruptedException{
+	public void step() throws InterruptedException, IOException{
 		executeInstruction();
 		getNextInstruction();
 	}

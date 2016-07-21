@@ -12,6 +12,7 @@ import uk.ac.glasgow.redeuce.DeuceConstants;
 import uk.ac.glasgow.redeuce.memory.Memory;
 import uk.ac.glasgow.redeuce.memory.Word;
 import uk.ac.glasgow.redeuce.peripherals.memory.CRDFileReader;
+import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardPuncher;
 import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardReader;
 import uk.ac.glasgow.redeuce.peripherals.memory.FixedCardDeck;
 import uk.ac.glasgow.redeuce.peripherals.memory.OutOfCardsException;
@@ -21,12 +22,14 @@ public class ProcessorTest {
 	String file = "/users/level3/2089278r/INTERN/REDEUCE/src/uk/ac/glasgow/redeuce/peripherals/memory/prog07DH.crd";
 	CRDFileReader testReader = new CRDFileReader(file);
 	DEUCECardReader reader = new DEUCECardReader();
+	DEUCECardPuncher puncher = new DEUCECardPuncher();
 	Memory deuceMemory = new Memory();
-	Processor proc = new Processor(reader, deuceMemory);
+	Processor proc;
 	
 	@Before public void initialise() throws OutOfCardsException, IOException{
 		FixedCardDeck newDeck = testReader.createNewDeck();
 		reader.loadDeck(newDeck);
+		proc = new Processor(reader, deuceMemory, puncher);
 	}
 	
 	//Tests that an instruction is written correctly
@@ -76,7 +79,7 @@ public class ProcessorTest {
 	
 	//Tests that the correct arithmetic happens in an actual instruction setting
 	@Test
-	public void ExecuteArithmeticTest2() throws InterruptedException{
+	public void ExecuteArithmeticTest2() throws InterruptedException, IOException{
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
 		proc.deuceMemory.setWord(4, new Word(70));
 		//wait 30 so we can go back to the original place where the word was stored
@@ -102,7 +105,7 @@ public class ProcessorTest {
 	
 	//Tests that the above test words as an executeInstruction as well
 	@Test
-	public void executeArithmeticTest3() throws InterruptedException{
+	public void executeArithmeticTest3() throws InterruptedException, IOException{
 		assertTrue(proc.deuceMemory.getWord(21).getAsInt() == 0);
 		proc.deuceMemory.setWord(5, new Word(70));
 		//wait 30 so we can go back to the original place where the word was stored
@@ -115,7 +118,7 @@ public class ProcessorTest {
 	
 	//Tests that a single transfer happens in the most basic case, time and wait are 0
 	@Test
-	public void singleTransferTest() throws InterruptedException {
+	public void singleTransferTest() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -135,7 +138,7 @@ public class ProcessorTest {
 	
 	//Tests that a single transfer happens on the correct mc depending on the wait and timing numbers
 	@Test
-	public void singleTransferTestWait() throws InterruptedException {
+	public void singleTransferTestWait() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -158,7 +161,7 @@ public class ProcessorTest {
 	
 	//Tests that a single transfer happens, and it ends at the correct time
 	@Test
-	public void singleTransferTestWaitTime() throws InterruptedException {
+	public void singleTransferTestWaitTime() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -180,7 +183,7 @@ public class ProcessorTest {
 	
 	//Tests that a single transfer happens correctly when wait is bigger than timing
 	@Test
-	public void singleTransferTestBigWait() throws InterruptedException {
+	public void singleTransferTestBigWait() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -207,7 +210,7 @@ public class ProcessorTest {
 	// NOTE: Actually not as basic because a double transfer will be different when T=W
 	// SECOND NOTE: Actually, it still works fine
 	@Test
-	public void doubleTransferTest() throws InterruptedException {
+	public void doubleTransferTest() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -230,7 +233,7 @@ public class ProcessorTest {
 	
 	//Test to determine that a double transfer happens correctly in the case of wait and time being equal
 	@Test
-	public void doubleTransferTestWait() throws InterruptedException {
+	public void doubleTransferTestWait() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -256,7 +259,7 @@ public class ProcessorTest {
 	
 	//Tests that the correct word gets written into mc4 and 5, and that the timing take the instruction ends on mc6
 	@Test
-	public void doubleTransferTestWaitTime() throws InterruptedException {
+	public void doubleTransferTestWaitTime() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -282,7 +285,7 @@ public class ProcessorTest {
 	
 	//Tests that a double transfer works in the case that the wait number is bigger than the timing
 	@Test
-	public void doubleTransferTestBigWait() throws InterruptedException {
+	public void doubleTransferTestBigWait() throws InterruptedException, IOException {
 		assertTrue(proc.deuceMemory.getWord(4).getAsInt() == 0);
 		proc.tickClock();
 		proc.tickClock();
@@ -307,7 +310,7 @@ public class ProcessorTest {
 	
 	//Tests that arithmetic works correctly in the case of a single transfer
 	@Test
-	public void singleArithmeticTestWait() throws InterruptedException {
+	public void singleArithmeticTestWait() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(20));
@@ -324,7 +327,7 @@ public class ProcessorTest {
 	
 	//Tests that addition works in the case of a double transfer
 	@Test
-	public void doubleArithmeticTestWait() throws InterruptedException {
+	public void doubleArithmeticTestWait() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(20));
@@ -343,7 +346,7 @@ public class ProcessorTest {
 	
 	//Tests if adding during a long transfer works correctly, taking numbers from different words in a delay line and adding them
 	@Test
-	public void longArithmeticTestWait() throws InterruptedException {
+	public void longArithmeticTestWait() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(20));
@@ -367,7 +370,7 @@ public class ProcessorTest {
 	
 	//Tests that long transfers word for subtraction as well (given that it works for addition, above
 	@Test
-	public void longSubTestWait() throws InterruptedException {
+	public void longSubTestWait() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(20));
@@ -393,7 +396,7 @@ public class ProcessorTest {
 	
 	//Tests that the memory is one step further in the case that the source word in a discrim_zero instruction is not a 0
 	@Test
-	public void discrimTest() throws InterruptedException {
+	public void discrimTest() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(1));
@@ -420,7 +423,7 @@ public class ProcessorTest {
 	
 	//Test that when the word is not 0, there is a delay of 1 additional timing, but not in the case that it is equal to 0
 	@Test
-	public void discrimTestWithTiming() throws InterruptedException {
+	public void discrimTestWithTiming() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(1));
@@ -448,7 +451,7 @@ public class ProcessorTest {
 	//Test to see if two subsequent words that need to be checked for discrim instructions can be done.
 	//Works, but should be noted that I have no idea if this is how it's intended to work...
 	@Test
-	public void discrimTestDouble() throws InterruptedException {
+	public void discrimTestDouble() throws InterruptedException, IOException {
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(1));
@@ -479,7 +482,7 @@ public class ProcessorTest {
 	
 	//Test that the other discrim instruction also works in some capacity
 	@Test
-	public void discrimNegativeTest() throws InterruptedException{
+	public void discrimNegativeTest() throws InterruptedException, IOException{
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(Integer.MAX_VALUE));
@@ -506,7 +509,7 @@ public class ProcessorTest {
 	
 	//Test to see that IO instructions are working in some manner, leading to System.outs
 	@Test
-	public void ioTestPrintOut() throws InterruptedException{
+	public void ioTestPrintOut() throws InterruptedException, IOException{
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(500));
@@ -521,7 +524,7 @@ public class ProcessorTest {
 	
 	//Test to see that a long characteristic can be used to print out multiple lines in a DL correctly
 	@Test
-	public void ioTestLongPrintOut() throws InterruptedException{
+	public void ioTestLongPrintOut() throws InterruptedException, IOException{
 		proc.tickClock();
 		proc.tickClock();
 		proc.deuceMemory.setWord(2, new Word(500));
@@ -558,9 +561,80 @@ public class ProcessorTest {
 	//The other IO instructions are not really going to be used, or at least have no implementations yet, so I'm unsure as to how testing them should go...
 	
 	
+	//Tests that the shifted left function returns the right value
+	@Test
+	public void divByTwoTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(500));
+		Instruction getTSdiv2 = new Instruction(0, DeuceConstants.SOURCE_SINGLESTORE_HALVED, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(getTSdiv2);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(5).getAsInt(), 250);
+	}
+	
+	//Tests that what is returned is double the number from before (everything shifted to the right in backwards binary)
+	@Test
+	public void mulByTwoTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(500));
+		Instruction getTSmult2 = new Instruction(0, DeuceConstants.SOURCE_STORE_DOUBLED, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(getTSmult2);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(5).getAsInt(), 1000);
+	}
+	
+	//Tests that 10111001 AND 10011111 returns 10011001
+	@Test
+	public void logicAndTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(185));
+		proc.deuceMemory.setWord(15, new Word(159));
+		Instruction logicAnd = new Instruction(0, DeuceConstants.SOURCE_AND, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(logicAnd);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(5).getAsInt(), 153);
+	}
+	
+	//Tests that 10111001 XOR 10011111 returns 00100110
+	@Test
+	public void logicXORTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(185));
+		proc.deuceMemory.setWord(15, new Word(159));
+		Instruction logicxor = new Instruction(0, DeuceConstants.SOURCE_XOR, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(logicxor);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(5).getAsInt(), 38);
+	}
+	
+	//Tests that source 27 contains 1
+	@Test
+	public void constantOneTest() throws InterruptedException, IOException{
+		Instruction single = new Instruction(0, DeuceConstants.SOURCE_CONSTANT_ONE, 5, 0, 0, 0, 0);
+		proc.setCurrentInstruction(single);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(5).getAsInt(), 1);
+	}
+	
+	//Tests that source 30 contains 0 by rewriting a value already held
+	public void zeroTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(185));
+		assertEquals(proc.deuceMemory.getWord(14).getAsInt(), 185);
+		Instruction logicxor = new Instruction(0, DeuceConstants.SOURCE_CONSTANT_ZERO, 14, 0, 0, 0, 0);
+		proc.setCurrentInstruction(logicxor);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(14).getAsInt(), 0);
+	}
+	
+	//Tests that source 31 contains -1, or the max int value, so adding should reduce the number by one
+	public void maximumTest() throws InterruptedException, IOException{
+		proc.deuceMemory.setWord(14, new Word(185));
+		assertEquals(proc.deuceMemory.getWord(14).getAsInt(), 185);
+		Instruction maximum = new Instruction(0, DeuceConstants.SOURCE_CONSTANT_NEGATIVE, 14, 0, 0, 0, 0);
+		proc.setCurrentInstruction(maximum);
+		proc.executeInstruction();
+		assertEquals(proc.deuceMemory.getWord(14).getAsInt(), 184);
+	}
+	
 	//Tests that the correct next instruction is retrieved after executing another
 	@Test
-	public void nextInstrTest() throws InterruptedException{
+	public void nextInstrTest() throws InterruptedException, IOException{
 		Word word = new Instruction(2, DeuceConstants.SOURCE_CONSTANT_ONE, 13, 0, 0, 0, 0).getAsWord();
 		proc.deuceMemory.setWord(1, word);
 		proc.tickClock();
@@ -581,7 +655,7 @@ public class ProcessorTest {
 	}
 	
 	@Test
-	public void simpleLoopTest() throws InterruptedException{
+	public void simpleLoopTest() throws InterruptedException, IOException{
 		proc.deuceMemory.setWord(13, new Word(5));
 		Word word1 = new Instruction (3, 27, 26, 0, 0, 0, 0).getAsWord();
 		Word word2 = new Instruction (2, 13, DeuceConstants.DEST_PUNCHOUT, 0, 0, 0, 0).getAsWord();
@@ -607,7 +681,7 @@ public class ProcessorTest {
 	}
 	
 	@Test
-	public void perfectSquaresBigTest() throws InterruptedException{
+	public void perfectSquaresBigTest() throws InterruptedException, IOException{
 		Word word1 = new Instruction(1, 27, 13, 0, 0, 0, 0).getAsWord();
 		proc.deuceMemory.setWord(1, word1);      //mc 0
 		proc.tickClock();
