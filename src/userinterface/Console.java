@@ -89,12 +89,6 @@ public class Console {
 	    }
 	    else if(command.equals("STOP"))
 	    {
-	    	Word currentWord = myProc.getCurrentInstruction().getAsWord();
-	    	for (int i=0; i<12; i++){
-	    		if (currentWord.getBits().get(i) == true){
-	    			isLamps.set(i);
-	    		}
-	    	}
 	    	return false;
 	    }
 	    else if(command.equals("START_PUNCH"))
