@@ -51,6 +51,10 @@ public class Processor {
 		return this.deuceMemory;
 	}
 	
+	public void resetMemory(){
+		this.deuceMemory.clear();
+	}
+	
 	public void cardLoad(FixedCardDeck deck){
 		this.reader.loadDeck(deck);
 	}

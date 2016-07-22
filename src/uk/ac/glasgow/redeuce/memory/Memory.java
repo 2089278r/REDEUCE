@@ -47,11 +47,20 @@ public class Memory {
 	}
 	
 	//Method to return contents in a delay line for the Displays
-	public String outputDelayLine(int delayLine){
+	public String outputDelayLine(int delayLine, int offset){
 		String delayStore = "";
 		for (int i=0; i<32; i++){
-			delayStore += linesAndStores[delayLine].contents[i].toString() + "\n";
+			delayStore += linesAndStores[delayLine].contents[(i + offset)%32].toString() + "\n";
 		}
 		return delayStore;
+	}
+	
+	public void clear(){
+		for (int i=1; i<linesAndStores.length; i++){
+			for(int j = 0; j<32; j++){
+				setWord(i, new Word(0));
+				increment();
+			}
+		}
 	}
 }

@@ -13,10 +13,12 @@ public class Display {
 	
 	Memory deuceMemory;
 	int delayLine;
+	int mcSlipOffset;
 	
 	public Display(Memory deuceMemory){
 		this.deuceMemory = deuceMemory;
 		this.delayLine = 1;
+		this.mcSlipOffset = 0;
 	}
 	
 	
@@ -32,13 +34,21 @@ public class Display {
             Writer delayWriter = new BufferedWriter(delayWriting);
             writer.write(deuceMemory.toString());
             writer.close();
-            delayWriter.write(deuceMemory.outputDelayLine(this.delayLine));
+            delayWriter.write(deuceMemory.outputDelayLine(delayLine, mcSlipOffset));
             delayWriter.close();
             System.out.println(deuceMemory.toString());
             
         } catch (IOException e) {
             System.err.println("Problem writing to the file");
         }
+    }
+    
+    public void changeDelay(int dl){
+    	this.delayLine = dl;
+    }
+    
+    public void mcSlip(){
+    		this.mcSlipOffset = (this.mcSlipOffset+2)%32;
     }
 
 }

@@ -5,21 +5,21 @@ Format: Should end with /n
 		
 Commands needed:
 		 Initial Input  ##actually on puncher
-		 Step
-		 Cards Loaded
+		 Step           ##implemented
+		 Cards Loaded   ##implemented
 		 Machine stopped
 		 TCA ON
 		 TCA OFF
 		 TCB ON
 		 TCB OFF
-		 ID CHANGED
-		 OS CHANGED
+		 ID CHANGED    ##implemented
+		 OS CHANGED    ##implemented
 		 REQUEST STOP
-		 CLEAR STORE
-		 ONE SHOT
-		 CLEAR OS LAMPS
-		 CLEAR ID LAMPS
-		 SELECT DL		 
+		 CLEAR STORE ##implemented
+		 ONE SHOT    ##implemented
+		 CLEAR OS LAMPS ##implemented
+		 CLEAR ID LAMPS ##implemented
+		 SELECT DL		##implemented
 
 States that can be changed:
 	   GO LAMP ON
