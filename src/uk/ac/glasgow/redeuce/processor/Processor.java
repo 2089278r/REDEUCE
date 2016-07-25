@@ -1,7 +1,12 @@
 package uk.ac.glasgow.redeuce.processor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import uk.ac.glasgow.redeuce.DeuceConstants;
 import uk.ac.glasgow.redeuce.memory.Memory;
@@ -25,11 +30,15 @@ public class Processor {
 	boolean go;
 	Memory deuceMemory; //For testing purposes I suppose? I guess we'll have a large object later where the processor can just read memory?
 	boolean tcb;
+	boolean tca;
+	
 	
 	public Processor(){
 		this.reader = new DEUCECardReader();
 		this.deuceMemory = new Memory();
 		this.puncher = new DEUCECardPuncher();
+		this.tcb = false;
+		this.tca = false;
 	}
 	
 	public Processor(DEUCECardReader reader, Memory deuceMemory, DEUCECardPuncher puncher) throws IOException{
@@ -336,7 +345,22 @@ public class Processor {
 			int dest = instruction.getDest();
 			switch(dest){
 			case(DeuceConstants.DEST_INPUT_OUTPUT):
-				if(instruction.getSource() == 9){
+				if(instruction.getSource() == 7){
+					try {
+						AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("ANALOG_A.WAV").getAbsoluteFile());
+					    Clip clip = AudioSystem.getClip();
+					    clip.open(audioInputStream);
+					    System.out.println("buzz!");
+					    clip.start();
+					    while(clip.getMicrosecondLength() != clip.getMicrosecondPosition())
+					    {
+					    }
+					} catch(Exception ex) {
+					    System.out.println("Error with playing sound.");
+					    ex.printStackTrace();
+					}
+				}
+				else if(instruction.getSource() == 9){
 					//if CardReader.isReading{
 					//   turnoff();
 					//if CardPuncher.isReady(){
