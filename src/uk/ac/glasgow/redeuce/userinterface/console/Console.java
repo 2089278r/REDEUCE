@@ -8,11 +8,10 @@ import uk.ac.glasgow.redeuce.memory.Word;
 import uk.ac.glasgow.redeuce.peripherals.CRDFileReader;
 import uk.ac.glasgow.redeuce.peripherals.OutOfCardsException;
 import uk.ac.glasgow.redeuce.processor.Processor;
-import uk.ac.glasgow.redeuce.userinterface.Display;
 
 public class Console {
 	
-	private Display myDisplay;
+	private ConsoleDisplay myDisplay;
 	private Scanner myScanner;
 	private Processor myProc;
 	private BitSet osLamps;
@@ -26,7 +25,7 @@ public class Console {
 	public Console(){
 	    myScanner = new Scanner(System.in);
 	    myProc = new Processor();
-	    myDisplay = new Display(myProc.getMemory());
+	    myDisplay = new ConsoleDisplay(myProc.getMemory());
 	    osLamps = new BitSet(32);
 	    idLamps = new BitSet(32);
 	    isLamps = new BitSet(13);

@@ -46,13 +46,22 @@ public class Memory {
 		return output;
 	}
 	
+	public String outputRegisters(){
+		String output = "";
+		for (int i=13; i<=21; i++){
+			output += linesAndStores[i].toString() + "\n";
+		}
+		return output;
+	}
+	
 	//Method to return contents in a delay line for the Displays
 	public String outputDelayLine(int delayLine, int offset){
-		String delayStore = "";
+		StringBuilder delayStore = new StringBuilder();
 		for (int i=0; i<32; i++){
-			delayStore += linesAndStores[delayLine].contents[(i + offset)%32].toString() + "\n";
+			delayStore.append(linesAndStores[delayLine].contents[(i + offset)%32].toString());
+			delayStore.append("\n");
 		}
-		return delayStore;
+		return delayStore.toString();
 	}
 	
 	public void clear(){

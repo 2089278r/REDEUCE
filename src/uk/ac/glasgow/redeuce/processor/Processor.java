@@ -175,7 +175,7 @@ public class Processor {
 		return operand;
 	}
 	
-	public void executeInstruction() throws InterruptedException, IOException{
+	public void executeInstruction() throws IOException{
 		// Huge nasty switch statement, or at least something which defines the types?
 	
 		for (int i=0; i<currentInstruction.getWait(); i++){
@@ -453,7 +453,7 @@ public class Processor {
 		this.tcb = false;
 	}
 	
-	public void step() throws InterruptedException, IOException{
+	public void step() throws IOException{
 		executeInstruction();
 		getNextInstruction();
 	}
