@@ -7,6 +7,9 @@ import java.util.BitSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.glasgow.redeuce.memory.SingleRegister;
+import uk.ac.glasgow.redeuce.memory.Word;
+
 public class SingleRegisterTest {
 
 	BitSet fullWord;

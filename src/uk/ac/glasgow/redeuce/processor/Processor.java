@@ -11,13 +11,13 @@ import javax.sound.sampled.Clip;
 import uk.ac.glasgow.redeuce.DeuceConstants;
 import uk.ac.glasgow.redeuce.memory.Memory;
 import uk.ac.glasgow.redeuce.memory.Word;
-import uk.ac.glasgow.redeuce.peripherals.memory.Card;
-import uk.ac.glasgow.redeuce.peripherals.memory.CardLine;
-import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardPuncher;
-import uk.ac.glasgow.redeuce.peripherals.memory.DEUCECardReader;
-import uk.ac.glasgow.redeuce.peripherals.memory.FixedCardDeck;
-import uk.ac.glasgow.redeuce.peripherals.memory.OutOfCardsException;
-import uk.ac.glasgow.redeuce.peripherals.memory.Triad;
+import uk.ac.glasgow.redeuce.peripherals.Card;
+import uk.ac.glasgow.redeuce.peripherals.CardLine;
+import uk.ac.glasgow.redeuce.peripherals.DEUCECardPuncher;
+import uk.ac.glasgow.redeuce.peripherals.DEUCECardReader;
+import uk.ac.glasgow.redeuce.peripherals.FixedCardDeck;
+import uk.ac.glasgow.redeuce.peripherals.OutOfCardsException;
+import uk.ac.glasgow.redeuce.peripherals.Triad;
 
 
 // Make just about everything that isn't called from outside Private
@@ -352,9 +352,9 @@ public class Processor {
 					    clip.open(audioInputStream);
 					    System.out.println("buzz!");
 					    clip.start();
-					    while(clip.getMicrosecondLength() != clip.getMicrosecondPosition())
-					    {
-					    }
+					    //while(clip.getMicrosecondLength() != clip.getMicrosecondPosition())
+					    //{
+					   // }
 					} catch(Exception ex) {
 					    System.out.println("Error with playing sound.");
 					    ex.printStackTrace();

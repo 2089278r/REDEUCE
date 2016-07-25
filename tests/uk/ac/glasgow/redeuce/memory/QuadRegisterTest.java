@@ -7,6 +7,9 @@ import java.util.BitSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.glasgow.redeuce.memory.QuadRegister;
+import uk.ac.glasgow.redeuce.memory.Word;
+
 public class QuadRegisterTest {
 	
 	BitSet fullWord;

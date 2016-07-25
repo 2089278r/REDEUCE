@@ -7,6 +7,8 @@ import java.util.BitSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.glasgow.redeuce.memory.InstructionWord;
+
 public class InstructionWordTest {
 	
 	BitSet fullWord;

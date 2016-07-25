@@ -6,6 +6,9 @@ import java.util.BitSet;
 
 import org.junit.Test;
 
+import uk.ac.glasgow.redeuce.memory.DoubleRegister;
+import uk.ac.glasgow.redeuce.memory.Word;
+
 public class DoubleRegisterTest {
 
 	@Test

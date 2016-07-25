@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import uk.ac.glasgow.redeuce.memory.Memory;
+import uk.ac.glasgow.redeuce.memory.MemoryUnit;
+
 public class MemoryTest {
 
 	@Test
