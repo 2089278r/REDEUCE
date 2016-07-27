@@ -21,6 +21,11 @@ public class Console {
 		UP, LEVEL, DOWN
 	}
 	private stopKey status;
+	private boolean atStop;
+	private boolean nisOn;
+	private boolean sourceOn;
+	private boolean destOn;
+	private boolean externalTreeRaised;
 
 	public Console(){
 	    myScanner = new Scanner(System.in);
@@ -30,7 +35,14 @@ public class Console {
 	    idLamps = new BitSet(32);
 	    isLamps = new BitSet(13);
 	    status = stopKey.UP;
+	    atStop = false;
+	    nisOn = false;
+	    sourceOn = false;
+	    destOn = false;
+	    externalTreeRaised = false;
 	}
+	
+	
 
 	public void menu() throws InterruptedException, IOException, OutOfCardsException{
 	    String command;
@@ -71,18 +83,24 @@ public class Console {
 	private boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
 	    if(command.equals("STEP"))
 	    {
-	    	if(this.status == stopKey.UP){
-	    		while(myProc.getCurrentInstruction().getGo() != 0){
+	    	if(!atStop){
+	    		if(this.status == stopKey.UP){
+	    			while(myProc.getCurrentInstruction().getGo() != 0){
+	    				myProc.step();
+	    				Thread.sleep(20);
+	    			}
+	    		}
+	    		else if(this.status == stopKey.LEVEL){
 	    			myProc.step();
 	    			Thread.sleep(20);
 	    		}
-	    	}
-	    	else if(this.status == stopKey.LEVEL){
-	    		myProc.step();
-	    		Thread.sleep(20);
-	    	}
-	    	else{
-	    		
+	    		else{
+	    			myProc.step();
+	    			if (myProc.getCurrentInstruction().getGo() == 0){
+	    				this.atStop = true;
+	    			}
+	    			Thread.sleep(20);
+	    		}
 	    	}
 	    }
 	    else if(command.equals("RELEASE")){
@@ -196,6 +214,9 @@ public class Console {
 	    	System.out.println("which switch are you flicking?");
 	    	int dl = myScanner.nextInt();
 	    	myDisplay.changeDelay(dl);
+	    }
+	    else if(command.equals("RELEASE")){
+	    	this.atStop = false;
 	    }
 	    else{
 	    	System.out.println("Sorry! Either incorrect format or that instruction isn't implemented yet!");
