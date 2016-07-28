@@ -70,7 +70,9 @@ public class ParserTest {
 		Scanner testScan = new Scanner(this.in);
 		out.println("LOAD_CARDS squaresProgram.txt");
 		out.println("INIT_IN");
-		out.println("ONE_SHOT_DIAL 10");
+		out.println("DELAY_LINE 1");
+		out.println("STOPKEY LEVEL");
+		out.println("STEP");
 		out.println("STOP");
 		while(testScan.hasNext()){
 			System.out.println(testScan.nextLine());

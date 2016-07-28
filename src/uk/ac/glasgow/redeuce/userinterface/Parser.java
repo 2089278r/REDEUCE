@@ -50,6 +50,7 @@ public class Parser implements Runnable{
 		this.idLamps = new BitSet(32);
 		this.osLamps = new BitSet(32);
 		this.isLamps = new BitSet(13);
+		this.status = stopKey.UP;
 	}
 
 	public void run(){
@@ -78,20 +79,38 @@ public class Parser implements Runnable{
 		String token = sc.next();
 		switch(token){
 		case "STEP":
-			if (this.status == stopKey.UP) {
-				while (myProc.getCurrentInstruction().getGo() != 0) {
-					myProc.step();
-					Thread.sleep(20);
-				}
-			} else if (this.status == stopKey.LEVEL) {
-				myProc.step();
-				Thread.sleep(20);
-			} else {
-
-			}
-			//			    
+			if(!atStop){
+	    		if(this.status == stopKey.UP){
+	    			while(myProc.getCurrentInstruction().getGo() != 0){
+	    				myProc.step();
+	    				//Thread.sleep(20);
+	    				out.println("STEPPED ");
+	    	    		memOutput();
+	    	    		out.println(this.atStop);
+	    			}
+	    		}
+	    		else if(this.status == stopKey.LEVEL){
+	    			myProc.step();
+	    			Thread.sleep(20);
+	    			out.println("STEPPED ");
+		    		memOutput();
+		    		out.println(this.atStop);
+	    		}
+	    		else{
+	    			myProc.step();
+	    			if (myProc.getCurrentInstruction().getGo() == 0){
+	    				this.atStop = true;
+	    			}
+	    			Thread.sleep(20);
+	    			out.println("STEPPED ");
+		    		memOutput();
+		    		out.println(this.atStop);
+	    		}
+	    	}
+			break;
 		case "RELEASE":
-			out.println("RELEASE");
+			this.atStop = false;
+			out.println("RELEASE " + this.atStop);
 		case "STOPKEY":
 			String setting = sc.next();
 			if(setting.equals("UP")){
@@ -113,26 +132,28 @@ public class Parser implements Runnable{
 			break;
 		case "INIT_IN":
 			myProc.initialInput();
-			out.println("INITIAL" + " " + memOutput());
+			out.println("INITIAL ");
+			memOutput();
 			break;
 		case "ONE_SHOT_DIAL":
 			int shots = sc.nextInt();
 			assert((shots <=10) && (shots > 0));
 			for (int i=0; i<shots; i++){
 				myProc.step();
-				out.println("ONE_SHOT" + " " + (shots - i) + " " + memOutput());
+				out.println("ONE_SHOT ");
+				memOutput();
 			}
 			break;
 		case "ONE_SHOT":
 			String direction = sc.next();
 			if (direction.equals("Down")){
 				myProc.step();
-				out.println(memOutput());
+				memOutput();
 			}
 			else if(direction.equals("Up")){
 				for (int i=0; i<600; i++){
 					myProc.step();
-					out.println(memOutput());
+					memOutput();
 				}
 			}
 			else{
@@ -141,7 +162,8 @@ public class Parser implements Runnable{
 			break;
 		case "STOP":
 			myProc.resetMemory();
-			out.println("STOP " + clearOutput());
+			out.println("STOP");
+			memOutput();
 			out.close();
 			in.close();
 			return;
@@ -151,7 +173,7 @@ public class Parser implements Runnable{
 			break;
 		case "FULL_CLEAR":
 			myProc.resetMemory();
-			out.println(clearOutput());
+			memOutput();
 			break;
 		case "SWITCH_OS":
 			int toggle = sc.nextInt();
@@ -187,6 +209,7 @@ public class Parser implements Runnable{
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
 			out.println("DELAY_LINE" + " " + this.delayLine);
+		    outputDelayLineDisplay();
 			break;
 		default:
 			assert(false);
@@ -204,40 +227,31 @@ public class Parser implements Runnable{
 		return sb.toString();
 	}
 	
-	private String memOutput() throws IOException{
-		StringBuilder sb = new StringBuilder();
-		sb.append("MEMORY");
-		sb.append(" ");
-		sb.append(outputDelayLineDisplay());
-		sb.append(outputRegisterDisplay());
-		return sb.toString();
+	private void memOutput() throws IOException{
+		outputDelayLineDisplay();
+		outputRegisterDisplay();
 	}
 	
-	private String clearOutput() throws IOException{
-		StringBuilder sb = new StringBuilder();
-		sb.append("FULL_CLEAR");
-		sb.append(" ");
-		sb.append(outputDelayLineDisplay());
-		sb.append(" ");
-		sb.append(outputRegisterDisplay());
-		return sb.toString();
-	}
+//	private void clearOutput() throws IOException{
+//		outputDelayLineDisplay();
+//		outputRegisterDisplay();
+//	}
 	
-	private String outputDelayLineDisplay() throws IOException{
+	private void outputDelayLineDisplay() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(DISPLAY_DL);
 		sb.append(" ");
 		sb.append(this.delayLine);
 		sb.append(" ");
 		sb.append(this.myProc.getMemory().outputDelayLine(this.delayLine, this.mcSlipOffset));
-		return sb.toString();
+		out.println(sb.toString());
 	}
-	private String outputRegisterDisplay() throws IOException{
+	private void outputRegisterDisplay() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(DISPLAY_REG);
 		sb.append(" ");
 		sb.append(this.myProc.getMemory().outputRegisters());
-		return sb.toString();
+		out.println(sb.toString());
 	}
 	private String outputOSLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();

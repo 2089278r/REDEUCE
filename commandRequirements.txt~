@@ -3,7 +3,7 @@ Parser Command specifications:
 STEP:
 	Keyword: STEP
 	In: STEP
-	Out: STEP, DLDisplay, RegisterDisplay, boolean atStop
+	Out: STEP, DLDisplay, RegisterDisplay
 
 ONE_SHOT: 
 	Keyword: ONE_SHOT
@@ -50,7 +50,7 @@ DELAY_LINE:
 RELEASE:
 	Keyword: RELEASE
 	In: RELEASE
-	Out: RELEASE, boolean atStop
+	Out: RELEASE
 
 STOPKEY:
 	Keyword: STOP_KEY
