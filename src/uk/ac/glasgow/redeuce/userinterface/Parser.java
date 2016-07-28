@@ -66,35 +66,34 @@ public class Parser implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void processCommand(Scanner sc) throws IOException, OutOfCardsException{
-		System.out.println("Process command is called!");
+	public void processCommand(Scanner sc) throws IOException, OutOfCardsException, InterruptedException{
+		//System.out.println("Process command is called!");
 		String token = sc.next();
 		switch(token){
 		case "STEP":
-			//			    	if(this.status == stopKey.UP){
-			//			    		while(myProc.getCurrentInstruction().getGo() != 0){
-			//			    			myProc.step();
-			//			    			Thread.sleep(20);
-			//			    		}
-			//			    	}
-			//			    	else if(this.status == stopKey.LEVEL){
-			//			    		myProc.step();
-			//			    		Thread.sleep(20);
-			//			    	}
-			//			    	else{
-			//			    		
-			//			    	}
+			if (this.status == stopKey.UP) {
+				while (myProc.getCurrentInstruction().getGo() != 0) {
+					myProc.step();
+					Thread.sleep(20);
+				}
+			} else if (this.status == stopKey.LEVEL) {
+				myProc.step();
+				Thread.sleep(20);
+			} else {
+
+			}
 			//			    
 		case "RELEASE":
-			//Presses release key
-			//Meaning that machine is no longer stopped!
-
+			out.println("RELEASE");
 		case "STOPKEY":
-			String setting = sc.nextLine();
+			String setting = sc.next();
 			if(setting.equals("UP")){
 				this.status = stopKey.UP;
 			}
@@ -104,33 +103,36 @@ public class Parser implements Runnable{
 			if(setting.equals("DOWN")){
 				this.status = stopKey.DOWN;
 			}
+			out.println("STOPKEY " + setting);
 			break;
 		case "LOAD_CARDS":
-			String deck = sc.nextLine();
+			String deck = sc.next();
 			CRDFileReader reader = new CRDFileReader(deck);
 			myProc.cardLoad(reader.createNewDeck());	
+			out.println("LOAD_CARDS " + deck);
 			break;
 		case "INIT_IN":
 			myProc.initialInput();
+			out.println("INITIAL" + " " + memOutput());
 			break;
 		case "ONE_SHOT_DIAL":
 			int shots = sc.nextInt();
 			assert((shots <=10) && (shots > 0));
 			for (int i=0; i<shots; i++){
 				myProc.step();
-				outputDisplay();
+				out.println("ONE_SHOT" + " " + (shots - i) + " " + memOutput());
 			}
 			break;
 		case "ONE_SHOT":
-			String direction = sc.nextLine();
+			String direction = sc.next();
 			if (direction.equals("Down")){
 				myProc.step();
-				outputDisplay();
+				out.println(memOutput());
 			}
 			else if(direction.equals("Up")){
 				for (int i=0; i<600; i++){
 					myProc.step();
-					outputDisplay();
+					out.println(memOutput());
 				}
 			}
 			else{
@@ -138,17 +140,20 @@ public class Parser implements Runnable{
 
 			break;
 		case "STOP":
+			myProc.resetMemory();
+			out.println("STOP " + clearOutput());
 			out.close();
 			in.close();
 			return;
 		case "START_PUNCH":
 			myProc.turnOnPunch();
+			out.println("PUNCH_START");
 			break;
 		case "FULL_CLEAR":
 			myProc.resetMemory();
+			out.println(clearOutput());
 			break;
 		case "SWITCH_OS":
-			
 			int toggle = sc.nextInt();
 			if(osLamps.get(toggle)){
 				osLamps.clear(toggle);
@@ -156,61 +161,103 @@ public class Parser implements Runnable{
 			else{
 				this.osLamps.set(toggle);
 			}
-			//String testOutput = new Word(osLamps).toString();
+			out.print(outputOSLamps());
 			break;
 		case "SWITCH_ID":
-			System.out.println("is the right command at least called?");
 			int idToggle = sc.nextInt();
 			int idState = sc.nextInt();
-			
 			if(idState == 1){
 				idLamps.set(idToggle);
 			}
 			else{
 				idLamps.clear(idToggle);
 			}
-			//String testOutput = new Word(idLamps).toString();
-			outputIDLamps();
+			out.println(outputIDLamps());
 			break;
-			
 		case "CLEAR_ID":
 			idLamps.clear();
-			//String testOutput = new Word(idLamps).toString();
+			out.println(outputIDLamps());
 			break;
 		case "CLEAR_OS":
 			osLamps.clear();
-			//String testOutput = new Word(osLamps).toString();
+			out.println(outputOSLamps());
 			break;
 		case "DELAY_LINE":
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
+			out.println("DELAY_LINE" + " " + this.delayLine);
 			break;
 		default:
 			assert(false);
 		}
-		outputDisplay();
-		
 	}
 	
-	private void outputDisplay() throws IOException{
-		outputDelayLineDisplay();
-		outputRegisterDisplay();
+	private String asString(BitSet bits){
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<bits.length(); i++){
+			if (bits.get(i)){
+				sb.append("1");
+				}
+			else sb.append("0");
+		}
+		return sb.toString();
 	}
-	private void outputDelayLineDisplay() throws IOException{
-		out.println(DISPLAY_DL);
+	
+	private String memOutput() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append("MEMORY");
+		sb.append(" ");
+		sb.append(outputDelayLineDisplay());
+		sb.append(outputRegisterDisplay());
+		return sb.toString();
 	}
-	private void outputRegisterDisplay() throws IOException{
-		out.println(DISPLAY_DL);
+	
+	private String clearOutput() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append("FULL_CLEAR");
+		sb.append(" ");
+		sb.append(outputDelayLineDisplay());
+		sb.append(" ");
+		sb.append(outputRegisterDisplay());
+		return sb.toString();
 	}
-	private void outputOSLamps() throws IOException{
-		out.println(OS_LAMPS);
+	
+	private String outputDelayLineDisplay() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append(DISPLAY_DL);
+		sb.append(" ");
+		sb.append(this.delayLine);
+		sb.append(" ");
+		sb.append(this.myProc.getMemory().outputDelayLine(this.delayLine, this.mcSlipOffset));
+		return sb.toString();
 	}
-	private void outputIDLamps() throws IOException{
-		out.println(ID_LAMPS);
-		//and then send state of ID lamps (bitset?)
+	private String outputRegisterDisplay() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append(DISPLAY_REG);
+		sb.append(" ");
+		sb.append(this.myProc.getMemory().outputRegisters());
+		return sb.toString();
 	}
-	private void outputISLamps() throws IOException{
-		out.println(IS_LAMPS);
+	private String outputOSLamps() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append(OS_LAMPS);
+		sb.append(" ");
+		sb.append(asString(this.osLamps));
+		return sb.toString();
+	}
+	private String outputIDLamps() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append(ID_LAMPS);
+		sb.append(" ");
+		sb.append(asString(this.idLamps));
+		return sb.toString();
+	}
+	private String outputISLamps() throws IOException{
+		StringBuilder sb = new StringBuilder();
+		sb.append(IS_LAMPS);
+		sb.append(" ");
+		sb.append(asString(this.isLamps));
+		return sb.toString();
 	}
 }

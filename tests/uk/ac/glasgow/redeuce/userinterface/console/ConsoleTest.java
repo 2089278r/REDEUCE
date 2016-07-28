@@ -19,7 +19,7 @@ public class ConsoleTest {
 	}
 	
 	@Test
-	@Ignore public void test() throws InterruptedException, IOException, OutOfCardsException {
+	public void test() throws InterruptedException, IOException, OutOfCardsException {
 		myConsole.menu();
 		assertTrue(true);
 	}

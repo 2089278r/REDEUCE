@@ -26,6 +26,9 @@ public class Console {
 	private boolean sourceOn;
 	private boolean destOn;
 	private boolean externalTreeRaised;
+	private BitSet nisSwitch;
+	private BitSet destSwitch;
+	private BitSet sourceSwitch;
 
 	public Console(){
 	    myScanner = new Scanner(System.in);
@@ -37,8 +40,11 @@ public class Console {
 	    status = stopKey.UP;
 	    atStop = false;
 	    nisOn = false;
+	    nisSwitch = new BitSet(3);
 	    sourceOn = false;
+	    sourceSwitch = new BitSet(5);
 	    destOn = false;
+	    destSwitch = new BitSet(5);
 	    externalTreeRaised = false;
 	}
 	
@@ -67,7 +73,7 @@ public class Console {
 	    System.out.println("|Press Release Key...............RELEASE|");
 	    System.out.println("|Change ID.....................SWITCH_ID|");
 	    System.out.println("|Change OS.....................SWITCH_OS|");
-	    System.out.println("|Stop the machine...................STOP|");
+	    System.out.println("|Stop the machine....................OFF|");
 	    System.out.println("|Set Stop Key....................STOPKEY|");
 	    System.out.println("|Pause when ID..............STOP_REQUEST|");
 	    System.out.println("|Clear all of memory..........FULL_CLEAR|");
@@ -76,6 +82,7 @@ public class Console {
 	    System.out.println("|Clear OS Lamps.................CLEAR_OS|");
 	    System.out.println("|Clear ID Lamps.................CLEAR_ID|");
 	    System.out.println("|Select a delay line..........DELAY_LINE|");
+	    System.out.println("|Change status of NIS check...CHANGE_NIS|");
 	    System.out.println("|Ready card puncher..........START_PUNCH|");
 	    System.out.println("=========================================");
 	}
@@ -104,9 +111,7 @@ public class Console {
 	    	}
 	    }
 	    else if(command.equals("RELEASE")){
-	    	System.out.println("Will implement soon!");
-	    	//Presses release key
-	    	//Meaning that machine is no longer stopped!
+	    	this.atStop = false;
 	    }
 	    else if(command.equals("STOPKEY"))
 	    {
@@ -146,26 +151,28 @@ public class Console {
 	    }
 	    else if(command.equals("ONE_SHOT"))
 	    {
-	    	System.out.println("Up or Down?");
-	    	String shots = myScanner.nextLine();
-	    	if (shots.equals("Down")){
-	    		myProc.step();
-	    		myDisplay.update();
-	    		Thread.sleep(20);
-	    	}
-	    	else if(shots.equals("Up")){
-	    		for (int i=0; i<600; i++){
-		    		myProc.step();
-		    		myDisplay.update();
-		    		Thread.sleep(10);
-		    	}
+	    	if(!atStop){
+	    		System.out.println("Up or Down?");
+	    		String shots = myScanner.nextLine();
+	    		if (shots.equals("Down")){
+	    			myProc.step();
+	    			myDisplay.update();
+	    			Thread.sleep(20);
+	    		}
+	    		else if(shots.equals("Up")){
+	    			for (int i=0; i<600; i++){
+	    				myProc.step();
+	    				myDisplay.update();
+	    				Thread.sleep(10);
+	    			}
+	    		}
 	    	}
 	    	else{
 	    		System.out.println("incorrect syntax, nothing happened");
 	    	}
 	    	
 	    }
-	    else if(command.equals("STOP"))
+	    else if(command.equals("OFF"))
 	    {
 	    	return false;
 	    }
@@ -218,6 +225,38 @@ public class Console {
 	    else if(command.equals("RELEASE")){
 	    	this.atStop = false;
 	    }
+	    else if(command.equals("CHANGE_NIS")){
+	    	if (this.nisOn) this.nisOn = false;
+	    	else this.nisOn = true;
+	    }
+	    else if(command.equals("CHANGE_SOURCE")){
+	    	if (this.sourceOn) this.sourceOn = false;
+	    	else this.sourceOn = true;
+	    }
+	    else if(command.equals("CHANGE_DEST")){
+	    	if (this.destOn) this.destOn = false;
+	    	else this.destOn = true;
+	    }
+	    else if(command.equals("SWITCH_NIS")){
+	    	System.out.println("which switch are you flicking?");
+	    	int nis = myScanner.nextInt();
+	    	nisSwitch.set(nis);
+	    }
+	    else if(command.equals("SWITCH_SOURCE")){
+	    	System.out.println("which switch are you flicking?");
+	    	int source = myScanner.nextInt();
+	    	nisSwitch.set(source);
+	    }
+	    else if(command.equals("SWITCH_DEST")){
+	    	System.out.println("which switch are you flicking?");
+	    	int dest = myScanner.nextInt();
+	    	nisSwitch.set(dest);
+	    }
+	    
+	    //IMPLEMENT THE REQUEST STOP SOMEHOW, PERHAPS HAVE A WORD
+	    //AS A FIELD, AND CONSTANTLY CHECK IF EXTERNAL TREE IS RAISED
+	    //IF SO, THEN CHECK THE WORD AND FIND A WAY TO WAIT IF THE WORD
+	    //MATCHES THE SETTINGS OF THE REQUESTED STOP
 	    else{
 	    	System.out.println("Sorry! Either incorrect format or that instruction isn't implemented yet!");
 	    }
@@ -231,8 +270,6 @@ public class Console {
 	    return command;
 	}
 	
-//	private void releaseKeyPressed(){
-//		
-//	}
+//Maybe all of this STOP business should be moved into the processor..? Just have "step" check whether or not we're at a stop etc...
 
 }

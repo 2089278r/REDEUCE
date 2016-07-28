@@ -39,19 +39,21 @@ public class Memory {
 	}
 	
 	public String toString(){
-		String output = "";
+		StringBuilder output = new StringBuilder();
 		for (int i=13; i<=16; i++){
-			output += linesAndStores[i].toString() + "\n";
+			output.append(linesAndStores[i].toString());
+			output.append(" ");
 		}
-		return output;
+		return output.toString();
 	}
 	
 	public String outputRegisters(){
-		String output = "";
+		StringBuilder output = new StringBuilder();
 		for (int i=13; i<=21; i++){
-			output += linesAndStores[i].toString() + "\n";
+			output.append(linesAndStores[i].toString());
+			output.append(" ");
 		}
-		return output;
+		return output.toString();
 	}
 	
 	//Method to return contents in a delay line for the Displays
@@ -59,7 +61,7 @@ public class Memory {
 		StringBuilder delayStore = new StringBuilder();
 		for (int i=0; i<32; i++){
 			delayStore.append(linesAndStores[delayLine].contents[(i + offset)%32].toString());
-			delayStore.append("\n");
+			delayStore.append(" ");
 		}
 		return delayStore.toString();
 	}

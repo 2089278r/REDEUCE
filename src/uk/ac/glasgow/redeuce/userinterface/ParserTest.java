@@ -2,6 +2,8 @@ package uk.ac.glasgow.redeuce.userinterface;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,8 +47,34 @@ public class ParserTest {
 		parser.start();
 		System.out.println("waits forever?");
 		Scanner testScan = new Scanner(this.in);
-		out.println("SWITCH_ID 0 1");
+		out.println("SWITCH_ID 14 1");
 		System.out.println(testScan.next());
+		testScan.close();
+	}
+	
+	@Test
+	public void stopTest() {
+		Thread parser = new Thread(this.myParser);
+		parser.start();
+		System.out.println("waits forever?");
+		Scanner testScan = new Scanner(this.in);
+		out.println("STOP");
+		System.out.println(testScan.next());
+		testScan.close();
+	}
+	
+	@Test
+	public void multipleCommandsTest() throws FileNotFoundException {
+		Thread parser = new Thread(this.myParser);
+		parser.start();
+		Scanner testScan = new Scanner(this.in);
+		out.println("LOAD_CARDS squaresProgram.txt");
+		out.println("INIT_IN");
+		out.println("ONE_SHOT_DIAL 10");
+		out.println("STOP");
+		while(testScan.hasNext()){
+			System.out.println(testScan.nextLine());
+		}
 		testScan.close();
 	}
 

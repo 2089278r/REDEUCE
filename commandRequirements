@@ -1,0 +1,98 @@
+Parser Command specifications:
+
+STEP:
+	Keyword: STEP
+	In: STEP
+	Out: STEP, DLDisplay, RegisterDisplay
+
+ONE_SHOT: 
+	Keyword: ONE_SHOT
+	expects: ONE_SHOT, String(up or down), DLDisplay, RegisterDisplay
+
+OFF:
+	Keyword: OFF
+	expects: OFF
+
+START_PUNCH:
+	Keyword: PUNCH
+	expects: PUNCH
+
+FULL_CLEAR:
+	Keyword: CLEAR
+	expects: CLEAR
+	Out: DLDisplay, RegisterDisplay
+
+SWITCH_ID:
+	Keyword: SWITCH_ID
+	In: SWITCH_ID, int switch, int to position
+	Out: ID_LAMPS, String IDDisplay
+
+SWITCH_OS:
+	Keyword: SWITCH_OS
+	In: SWITCH_OS, int switch, int to position
+	Out: OS_LAMPS, String OSDisplay
+
+CLEAR_ID:
+	Keyword: CLEAR_ID
+	In: CLEAR_ID
+	Out: CLEAR_ID, String IDDisplay(now empty)	
+	
+CLEAR_OS:
+	Keyword: CLEAR_OS
+	In: CLEAR_OS
+	Out: CLEAR_OS, String OSDisplay(now empty)
+
+DELAY_LINE:
+	Keyword: DELAY_LINE
+	In: DELAY_LINE, int for delay they want displayed
+	Out: DELAY_LINE, DLDisplay
+
+RELEASE:
+	Keyword: RELEASE
+	In: RELEASE
+	Out: RELEASE
+
+STOPKEY:
+	Keyword: STOP_KEY
+	In: STOP_KEY, String setting (either UP, LEVEL, or DOWN)
+	Out: stopKey boolean???
+
+LOAD_CARDS:
+	Keyword: LOAD_CARDS
+	In: LOAD_CARDS, String filename (or something else?)
+	Out: DLDisplay, RegisterDisplay
+
+INIT_IN:
+	Keyword: INIT_IN
+	In: INIT_IN
+	Out: DLDisplay, RegisterDisplay
+
+ONE_SHOT_DIAL:
+	Keyword: DIAL
+	IN: DIAL, integer 0-10
+	Out: DLDisplay, RegisterDisplay
+
+DLDisplay:
+	Keyword: DLDisplay
+    In: DLDisplay
+	Out: DLDisplay + Delay line number + 32 32-bit strings
+
+RegisterDisplay:
+	Keyword: RegisterDisplay
+    In: RegisterDisplay
+	Out: RegisterDisplay + 18 32-bit strings
+
+OSDisplay:
+	Keyword: OSDisplay
+	In: OSDisplay
+	Out: OS + 32-bit string
+
+IDDisplay:
+	Keyword: IDDisplay
+	In: IDDisplay
+	Out: ID + 32-bit string
+
+PUNCH:
+	Keyword; PUNCH
+	IN: PUNCH
+	Out: PUNCHED + String of store's contents
