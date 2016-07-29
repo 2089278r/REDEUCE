@@ -31,6 +31,7 @@ public class ParserTest {
 		InputStream parserIn = new PipedInputStream(temp);
 		this.out = new PrintStream(temp);
 		
+		
 		//Stream to send responses from the parser
 		PipedOutputStream parserOut = new PipedOutputStream();
 		this.in = new PipedInputStream(parserOut);
@@ -58,7 +59,7 @@ public class ParserTest {
 		parser.start();
 		System.out.println("waits forever?");
 		Scanner testScan = new Scanner(this.in);
-		out.println("STOP");
+		out.println("OFF");
 		System.out.println(testScan.next());
 		testScan.close();
 	}
@@ -69,11 +70,16 @@ public class ParserTest {
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("LOAD_CARDS squaresProgram.txt");
+		System.out.println(testScan.next());
 		out.println("INIT_IN");
+		System.out.println(testScan.next());
 		out.println("DELAY_LINE 1");
+		System.out.println(testScan.next());
 		out.println("STOPKEY LEVEL");
+		System.out.println(testScan.next());
 		out.println("STEP");
-		out.println("STOP");
+		System.out.println(testScan.next());
+		out.println("OFF");
 		while(testScan.hasNext()){
 			System.out.println(testScan.nextLine());
 		}

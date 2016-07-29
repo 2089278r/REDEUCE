@@ -32,14 +32,16 @@ public class Parser implements Runnable{
 	int delayLine;
 	int mcSlipOffset;
 	private stopKey status;
-	BitSet idLamps;
-	BitSet osLamps;
-	BitSet isLamps;
+	private BitSet idLamps;
+	private BitSet osLamps;
 	private boolean atStop;
 	private boolean nisOn;
 	private boolean sourceOn;
 	private boolean destOn;
 	private boolean externalTreeRaised;
+	private BitSet nisSwitch;
+	private BitSet destSwitch;
+	private BitSet sourceSwitch;
 	
 	public Parser(InputStream in, OutputStream out, Processor myProc){
 		this.in = in;
@@ -49,7 +51,9 @@ public class Parser implements Runnable{
 		this.mcSlipOffset = 0;
 		this.idLamps = new BitSet(32);
 		this.osLamps = new BitSet(32);
-		this.isLamps = new BitSet(13);
+		this.nisSwitch = new BitSet(3);
+		this.sourceSwitch = new BitSet(5);
+		this.destSwitch = new BitSet(5);
 		this.status = stopKey.UP;
 	}
 
@@ -78,10 +82,10 @@ public class Parser implements Runnable{
 		//System.out.println("Process command is called!");
 		String token = sc.next();
 		switch(token){
-		case "STEP":
+		case "RUN":
 			if(!atStop){
 	    		if(this.status == stopKey.UP){
-	    			while(myProc.getCurrentInstruction().getGo() != 0){
+	    			while(myProc.getCurrentInstruction().getGo() != 0 && !stopRequested()){
 	    				myProc.step();
 	    				//Thread.sleep(20);
 	    				out.println("STEPPED ");
@@ -160,7 +164,7 @@ public class Parser implements Runnable{
 			}
 
 			break;
-		case "STOP":
+		case "OFF":
 			myProc.resetMemory();
 			out.println("STOP");
 			memOutput();
@@ -183,7 +187,7 @@ public class Parser implements Runnable{
 			else{
 				this.osLamps.set(toggle);
 			}
-			out.print(outputOSLamps());
+			outputOSLamps();
 			break;
 		case "SWITCH_ID":
 			int idToggle = sc.nextInt();
@@ -194,26 +198,125 @@ public class Parser implements Runnable{
 			else{
 				idLamps.clear(idToggle);
 			}
-			out.println(outputIDLamps());
+			outputIDLamps();
 			break;
 		case "CLEAR_ID":
 			idLamps.clear();
-			out.println(outputIDLamps());
+			outputIDLamps();
 			break;
 		case "CLEAR_OS":
 			osLamps.clear();
-			out.println(outputOSLamps());
+			outputOSLamps();
 			break;
 		case "DELAY_LINE":
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
-			out.println("DELAY_LINE" + " " + this.delayLine);
+			//out.println("DELAY_LINE" + " " + this.delayLine);
 		    outputDelayLineDisplay();
 			break;
+		case "CHANGE_NIS":
+			if (this.nisOn) this.nisOn = false;
+	    	else this.nisOn = true;
+			out.println("NIS_CHANGED " + this.nisOn);
+			break;
+		case "CHANGE_SOURCE":
+			if (this.sourceOn) this.sourceOn = false;
+	    	else this.sourceOn = true;
+			out.println("SOURCE_CHANGED " + this.sourceOn);
+			break;
+		case "CHANGE_DEST":
+			if (this.destOn) this.destOn = false;
+	    	else this.destOn = true;
+			out.println("DEST_CHANGED " + this.destOn);
+			break;
+		case "SWITCH_NIS":
+			int nis = sc.nextInt();
+	    	if(nisSwitch.get(nis)){
+	    		nisSwitch.clear(nis);
+	    	}
+	    	else nisSwitch.set(nis);
+	    	outputISLamps();
+	    	break;
+		case "SWITCH_SOURCE":
+			int source = sc.nextInt();
+	    	if(nisSwitch.get(source)){
+	    		nisSwitch.clear(source);
+	    	}
+	    	else nisSwitch.set(source);
+	    	outputISLamps();
+	    	break;
+		case "SWITCH_DEST":
+			int dest = sc.nextInt();
+	    	if(nisSwitch.get(dest)){
+	    		nisSwitch.clear(dest);
+	    	}
+	    	else nisSwitch.set(dest);
+	    	outputISLamps();
+	    	break;
+		case "EXT_TREE":
+		    if (externalTreeRaised){
+		    	this.externalTreeRaised = false;
+		    }
+		    else this.externalTreeRaised = true;
+		    break;
 		default:
 			assert(false);
 		}
+	}
+	
+	private boolean stopRequested(){
+		if(externalTreeRaised){
+			int nisValue = new Word(nisSwitch).getAsInt();
+			int sourceValue = new Word(sourceSwitch).getAsInt();
+			int destValue = new Word(destSwitch).getAsInt();
+			if(!nisOn && !sourceOn && !destOn){
+				return false;
+			}
+			else if(nisOn && !sourceOn && !destOn){
+				if (nisValue == (myProc.getCurrentInstruction().getNIS())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(!nisOn && sourceOn && !destOn){
+				if (sourceValue == (myProc.getCurrentInstruction().getSource())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(!nisOn && !sourceOn && destOn){
+				if (destValue == (myProc.getCurrentInstruction().getDest())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(nisOn && sourceOn && !destOn){
+				if ((nisValue == (myProc.getCurrentInstruction().getNIS())) && 
+					(sourceValue == (myProc.getCurrentInstruction().getSource()))){
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			else if(!nisOn && sourceOn && destOn){
+				if ((sourceValue == (myProc.getCurrentInstruction().getSource())) && 
+					(destValue == (myProc.getCurrentInstruction().getDest()))){
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			else if(nisOn && sourceOn && destOn){
+				if ((nisValue == (myProc.getCurrentInstruction().getNIS())) && 
+					(sourceValue == (myProc.getCurrentInstruction().getSource())) && 
+					(destValue == (myProc.getCurrentInstruction().getDest()))){
+						System.out.println("yeah");
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			
+		}
+		return false;
 	}
 	
 	private String asString(BitSet bits){
@@ -228,14 +331,9 @@ public class Parser implements Runnable{
 	}
 	
 	private void memOutput() throws IOException{
-		outputDelayLineDisplay();
 		outputRegisterDisplay();
+		outputDelayLineDisplay();
 	}
-	
-//	private void clearOutput() throws IOException{
-//		outputDelayLineDisplay();
-//		outputRegisterDisplay();
-//	}
 	
 	private void outputDelayLineDisplay() throws IOException{
 		StringBuilder sb = new StringBuilder();
@@ -251,27 +349,30 @@ public class Parser implements Runnable{
 		sb.append(DISPLAY_REG);
 		sb.append(" ");
 		sb.append(this.myProc.getMemory().outputRegisters());
+		//System.out.println(this.myProc.getMemory().outputRegisters());
 		out.println(sb.toString());
 	}
-	private String outputOSLamps() throws IOException{
+	private void outputOSLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(OS_LAMPS);
 		sb.append(" ");
 		sb.append(asString(this.osLamps));
-		return sb.toString();
+		out.println(sb.toString());
 	}
-	private String outputIDLamps() throws IOException{
+	private void outputIDLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(ID_LAMPS);
 		sb.append(" ");
 		sb.append(asString(this.idLamps));
-		return sb.toString();
+		out.println(sb.toString());
 	}
-	private String outputISLamps() throws IOException{
+	private void outputISLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(IS_LAMPS);
 		sb.append(" ");
-		sb.append(asString(this.isLamps));
-		return sb.toString();
+		sb.append(asString(this.nisSwitch));
+		sb.append(asString(this.sourceSwitch));
+		sb.append(asString(this.destSwitch));
+		out.println(sb.toString());
 	}
 }

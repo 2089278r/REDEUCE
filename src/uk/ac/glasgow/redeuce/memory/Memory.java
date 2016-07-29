@@ -51,6 +51,7 @@ public class Memory {
 		StringBuilder output = new StringBuilder();
 		for (int i=13; i<=21; i++){
 			output.append(linesAndStores[i].toString());
+			System.out.println(linesAndStores[i].toString());
 			output.append(" ");
 		}
 		return output.toString();

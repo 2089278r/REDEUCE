@@ -16,7 +16,6 @@ public class Console {
 	private Processor myProc;
 	private BitSet osLamps;
 	private BitSet idLamps;
-	private BitSet isLamps;
 	public enum stopKey {
 		UP, LEVEL, DOWN
 	}
@@ -36,7 +35,6 @@ public class Console {
 	    myDisplay = new ConsoleDisplay(myProc.getMemory());
 	    osLamps = new BitSet(32);
 	    idLamps = new BitSet(32);
-	    isLamps = new BitSet(13);
 	    status = stopKey.UP;
 	    atStop = false;
 	    nisOn = false;
@@ -88,11 +86,11 @@ public class Console {
 	}
 
 	private boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
-	    if(command.equals("STEP"))
+	    if(command.equals("RUN"))
 	    {
 	    	if(!atStop){
 	    		if(this.status == stopKey.UP){
-	    			while(myProc.getCurrentInstruction().getGo() != 0){
+	    			while((myProc.getCurrentInstruction().getGo() != 0) && (!stopRequested())){
 	    				myProc.step();
 	    				Thread.sleep(20);
 	    			}
@@ -140,13 +138,15 @@ public class Console {
 	    }
 	    else if(command.equals("ONE_SHOT_DIAL"))
 	    {
-	    	System.out.println("Enter number of single shots between 1 and 10: ");
-	    	int shots = myScanner.nextInt();
-	    	assert((shots <=10) && (shots > 0));
-	    	for (int i=0; i<shots; i++){
-	    		myProc.step();
-	    		myDisplay.update();
-	    		Thread.sleep(20);
+	    	if(!atStop){
+				System.out.println("Enter number of single shots between 1 and 10: ");
+				int shots = myScanner.nextInt();
+				assert ((shots <= 10) && (shots > 0));
+				for (int i = 0; i < shots; i++) {
+					myProc.step();
+					myDisplay.update();
+					Thread.sleep(20);
+				}
 	    	}
 	    }
 	    else if(command.equals("ONE_SHOT"))
@@ -161,9 +161,12 @@ public class Console {
 	    		}
 	    		else if(shots.equals("Up")){
 	    			for (int i=0; i<600; i++){
-	    				myProc.step();
-	    				myDisplay.update();
-	    				Thread.sleep(10);
+	    				if(!stopRequested()){
+	    					myProc.step();
+	    					myDisplay.update();
+	    					Thread.sleep(10);
+	    				}
+	    				else return true;
 	    			}
 	    		}
 	    	}
@@ -240,19 +243,36 @@ public class Console {
 	    else if(command.equals("SWITCH_NIS")){
 	    	System.out.println("which switch are you flicking?");
 	    	int nis = myScanner.nextInt();
-	    	nisSwitch.set(nis);
+	    	if(nisSwitch.get(nis)){
+	    		nisSwitch.clear(nis);
+	    	}
+	    	else nisSwitch.set(nis);
+	    	System.out.println(new Word(nisSwitch).getAsInt());
 	    }
 	    else if(command.equals("SWITCH_SOURCE")){
 	    	System.out.println("which switch are you flicking?");
 	    	int source = myScanner.nextInt();
-	    	nisSwitch.set(source);
+	    	if(sourceSwitch.get(source)){
+	    		sourceSwitch.clear(source);
+	    	}
+	    	else sourceSwitch.set(source);
+	    	System.out.println(new Word(sourceSwitch).getAsInt());
 	    }
 	    else if(command.equals("SWITCH_DEST")){
 	    	System.out.println("which switch are you flicking?");
 	    	int dest = myScanner.nextInt();
-	    	nisSwitch.set(dest);
+	    	if(destSwitch.get(dest)){
+	    		destSwitch.clear(dest);
+	    	}
+	    	else destSwitch.set(dest);
+	    	System.out.println(new Word(destSwitch).getAsInt());
 	    }
-	    
+	    else if(command.equals("EXT_TREE")){
+	    	if (externalTreeRaised){
+	    		this.externalTreeRaised = false;
+	    	}
+	    	else this.externalTreeRaised = true;
+	    }
 	    //IMPLEMENT THE REQUEST STOP SOMEHOW, PERHAPS HAVE A WORD
 	    //AS A FIELD, AND CONSTANTLY CHECK IF EXTERNAL TREE IS RAISED
 	    //IF SO, THEN CHECK THE WORD AND FIND A WAY TO WAIT IF THE WORD
@@ -270,6 +290,58 @@ public class Console {
 	    return command;
 	}
 	
-//Maybe all of this STOP business should be moved into the processor..? Just have "step" check whether or not we're at a stop etc...
+	private boolean stopRequested(){
+		if(externalTreeRaised){
+			int nisValue = new Word(nisSwitch).getAsInt();
+			int sourceValue = new Word(sourceSwitch).getAsInt();
+			int destValue = new Word(destSwitch).getAsInt();
+			if(!nisOn && !sourceOn && !destOn){
+				return false;
+			}
+			else if(nisOn && !sourceOn && !destOn){
+				if (nisValue == (myProc.getCurrentInstruction().getNIS())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(!nisOn && sourceOn && !destOn){
+				if (sourceValue == (myProc.getCurrentInstruction().getSource())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(!nisOn && !sourceOn && destOn){
+				if (destValue == (myProc.getCurrentInstruction().getDest())){
+					System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+					return true;
+				}
+			}
+			else if(nisOn && sourceOn && !destOn){
+				if ((nisValue == (myProc.getCurrentInstruction().getNIS())) && 
+					(sourceValue == (myProc.getCurrentInstruction().getSource()))){
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			else if(!nisOn && sourceOn && destOn){
+				if ((sourceValue == (myProc.getCurrentInstruction().getSource())) && 
+					(destValue == (myProc.getCurrentInstruction().getDest()))){
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			else if(nisOn && sourceOn && destOn){
+				if ((nisValue == (myProc.getCurrentInstruction().getNIS())) && 
+					(sourceValue == (myProc.getCurrentInstruction().getSource())) && 
+					(destValue == (myProc.getCurrentInstruction().getDest()))){
+						System.out.println("yeah");
+						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
+						return true;
+				}
+			}
+			
+		}
+		return false;
+	}
 
 }
