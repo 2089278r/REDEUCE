@@ -38,20 +38,10 @@ public class Memory {
 		linesAndStores[toDelayLine].write(word);
 	}
 	
-	public String toString(){
-		StringBuilder output = new StringBuilder();
-		for (int i=13; i<=16; i++){
-			output.append(linesAndStores[i].toString());
-			output.append(" ");
-		}
-		return output.toString();
-	}
-	
 	public String outputRegisters(){
 		StringBuilder output = new StringBuilder();
 		for (int i=13; i<=21; i++){
-			output.append(linesAndStores[i].toString());
-			System.out.println(linesAndStores[i].toString());
+			output.append(linesAndStores[i].makeString());
 			output.append(" ");
 		}
 		return output.toString();

@@ -58,7 +58,6 @@ public class Parser implements Runnable{
 	}
 
 	public void run(){
-		System.out.println("running!");
 		Scanner sc = new Scanner(this.in);
 		while(sc.hasNext()){
 			try {
@@ -79,7 +78,6 @@ public class Parser implements Runnable{
 	}
 	
 	public void processCommand(Scanner sc) throws IOException, OutOfCardsException, InterruptedException{
-		//System.out.println("Process command is called!");
 		String token = sc.next();
 		switch(token){
 		case "RUN":
@@ -114,7 +112,7 @@ public class Parser implements Runnable{
 			break;
 		case "RELEASE":
 			this.atStop = false;
-			out.println("RELEASE " + this.atStop);
+			out.print("RELEASE " + this.atStop);
 		case "STOPKEY":
 			String setting = sc.next();
 			if(setting.equals("UP")){
@@ -212,7 +210,6 @@ public class Parser implements Runnable{
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
-			//out.println("DELAY_LINE" + " " + this.delayLine);
 		    outputDelayLineDisplay();
 			break;
 		case "CHANGE_NIS":
@@ -263,6 +260,7 @@ public class Parser implements Runnable{
 		default:
 			assert(false);
 		}
+		out.println();
 	}
 	
 	private boolean stopRequested(){
@@ -309,7 +307,6 @@ public class Parser implements Runnable{
 				if ((nisValue == (myProc.getCurrentInstruction().getNIS())) && 
 					(sourceValue == (myProc.getCurrentInstruction().getSource())) && 
 					(destValue == (myProc.getCurrentInstruction().getDest()))){
-						System.out.println("yeah");
 						System.out.println(myProc.getCurrentInstruction().getAsWord().toString());
 						return true;
 				}
@@ -349,7 +346,6 @@ public class Parser implements Runnable{
 		sb.append(DISPLAY_REG);
 		sb.append(" ");
 		sb.append(this.myProc.getMemory().outputRegisters());
-		//System.out.println(this.myProc.getMemory().outputRegisters());
 		out.println(sb.toString());
 	}
 	private void outputOSLamps() throws IOException{

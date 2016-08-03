@@ -46,10 +46,14 @@ public class ParserTest {
 		Thread parser = new Thread(this.myParser);
 		
 		parser.start();
-		System.out.println("waits forever?");
 		Scanner testScan = new Scanner(this.in);
-		out.println("SWITCH_ID 14 1");
-		System.out.println(testScan.next());
+		out.print("SWITCH_ID ");
+		out.print("14 ");
+		out.print("1 ");
+		out.println("OFF");
+		while(testScan.hasNext()){
+			System.out.println(testScan.nextLine());
+		}
 		testScan.close();
 	}
 	
@@ -57,10 +61,9 @@ public class ParserTest {
 	public void stopTest() {
 		Thread parser = new Thread(this.myParser);
 		parser.start();
-		System.out.println("waits forever?");
 		Scanner testScan = new Scanner(this.in);
 		out.println("OFF");
-		System.out.println(testScan.next());
+		System.out.println(testScan.nextLine());
 		testScan.close();
 	}
 	
@@ -70,15 +73,31 @@ public class ParserTest {
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("LOAD_CARDS squaresProgram.txt");
-		System.out.println(testScan.next());
+		System.out.println(testScan.nextLine());
 		out.println("INIT_IN");
-		System.out.println(testScan.next());
+		System.out.println(testScan.nextLine());
 		out.println("DELAY_LINE 1");
-		System.out.println(testScan.next());
+		System.out.println(testScan.nextLine());
 		out.println("STOPKEY LEVEL");
-		System.out.println(testScan.next());
-		out.println("STEP");
-		System.out.println(testScan.next());
+		System.out.println(testScan.nextLine());
+		out.println("RUN");
+		System.out.println(testScan.nextLine());
+		out.println("RUN");
+		System.out.println(testScan.nextLine());
+		out.println("OFF");
+		while(testScan.hasNext()){
+			System.out.println(testScan.nextLine());
+		}
+		testScan.close();
+	}
+	
+	@Test
+	public void memOutputTest(){
+		Thread parser = new Thread(this.myParser);
+		parser.start();
+		Scanner testScan = new Scanner(this.in);
+		out.println("LOAD_CARDS squaresProgram.txt");
+		out.println("INIT_IN");
 		out.println("OFF");
 		while(testScan.hasNext()){
 			System.out.println(testScan.nextLine());

@@ -27,10 +27,10 @@ public abstract class MemoryUnit {
 		return contents[(counter % size)];
 	}
 	
-	public String toString(){
+	public String makeString(){
 		String output = "";
 		for (int i=0; i<size; i++){
-			output += contents[i].toString() + "\n";
+			output += contents[i].toString() + " ";
 		}
 		return output;
 	}
