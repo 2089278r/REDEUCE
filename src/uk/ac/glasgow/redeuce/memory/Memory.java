@@ -38,6 +38,16 @@ public class Memory {
 		linesAndStores[toDelayLine].write(word);
 	}
 	
+	//USED ONLY FOR CONSOLETEST OUTPUT, HENCE ONLY SHOWING 4 REGISTERS
+	public String toString(){
+		StringBuilder output = new StringBuilder();
+		for (int i=13; i<=16; i++){
+			output.append(linesAndStores[i].makeString());
+			output.append("\n");
+		}
+		return output.toString();
+	}
+	
 	public String outputRegisters(){
 		StringBuilder output = new StringBuilder();
 		for (int i=13; i<=21; i++){
