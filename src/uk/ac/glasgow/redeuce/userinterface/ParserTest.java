@@ -52,19 +52,19 @@ public class ParserTest {
 		while(!userIn.equals("OFF")){
 			System.out.println(userIn);
 			out.println(userIn);
-			System.out.println("got a command but I don't do anything with it");
+			//System.out.println("got a command but I don't do anything with it");
 			int expectedResponse;
 			if(userIn.equals("ONE_SHOT Up")){
 				expectedResponse = 1200;
 			}
 			else if(userIn.equals("INIT_IN")){
-				expectedResponse = 4;
+				expectedResponse = 3;
 			}
-			else expectedResponse = 2;
+			else expectedResponse = 1;
 			for(int i=0; i<expectedResponse; i++){
 				System.out.println(testScan.nextLine());
 			}
-			System.out.println("what is happen?");
+			System.out.println("next command?");
 			userIn = userInput.nextLine();
 		}
 		testScan.close();
@@ -77,29 +77,20 @@ public class ParserTest {
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("OFF");
-		System.out.println("Going on...");
 		System.out.print(testScan.nextLine());
 		testScan.close();
 	}
 	
 	@Test
 	public void multipleCommandsTest() throws FileNotFoundException {
-		System.out.println("Started!");
 		Thread parser = new Thread(this.myParser);
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("LOAD_CARDS squaresProgram.txt");
-		System.out.println(testScan.nextLine());
 		out.println("INIT_IN");
-		System.out.println(testScan.nextLine());
 		out.println("DELAY_LINE 1");
-		System.out.println(testScan.nextLine());
 		out.println("STOPKEY LEVEL");
-		System.out.println(testScan.nextLine());
 		out.println("RUN");
-		System.out.println(testScan.nextLine());
-		out.println("RUN");
-		System.out.println(testScan.nextLine());
 		out.println("OFF");
 		while(testScan.hasNext()){
 			System.out.println(testScan.nextLine());
@@ -113,11 +104,15 @@ public class ParserTest {
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("LOAD_CARDS squaresProgram.txt");
+		System.out.println(testScan.nextLine());
 		out.println("INIT_IN");
+		System.out.println(testScan.nextLine());
+		System.out.println(testScan.nextLine());
+		System.out.println(testScan.nextLine());
 		out.println("OFF");
-		while(testScan.hasNext()){
-			System.out.println(testScan.nextLine());
-		}
+		System.out.println(testScan.nextLine());
+		System.out.println(testScan.nextLine());
+		System.out.println(testScan.nextLine());
 		testScan.close();
 	}
 

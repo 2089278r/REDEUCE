@@ -24,9 +24,9 @@ public class ParsedConsole {
 	private static Parser myParser;
 	private static ConsoleDisplay myDisplay;
 		
-		private static boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
-			while(!command.equals("OFF")){
-				int expectedResponse = myParser.processCommand(command, myInput);
+//		private static boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
+//			while(!command.equals("OFF")){
+//				int expectedResponse = myParser.processCommand(command);
 				//System.out.println(expectedResponse);
 //				if(command.equals("ONE_SHOT")){
 //					System.out.println("Please enter which cards you'll enter: ");
@@ -69,24 +69,42 @@ public class ParsedConsole {
 //					expectedResponse = 2;
 //				}
 //				
-				for(int i=0; i<expectedResponse; i++){
-					System.out.println(outputScan.nextLine());
-				}
-				
-				myDisplay.update();
-				return true;
-			}
-		    return false;
-		}
+//				for(int i=0; i<expectedResponse; i++){
+//					System.out.println(outputScan.nextLine());
+//				}
+//				
+//				myDisplay.update();
+//				return true;
+//			}
+//		    return false;
+//		}
 	
-		public static void menu() throws InterruptedException, IOException, OutOfCardsException{
-		    String command;
+		public static void menu() throws InterruptedException, IOException{
+		   // String command;
 		    boolean running = true;
+		    Thread parser = new Thread(myParser);
+			parser.start();
 		    while(running)
 		    {
 		        displayMenu();
-		        command = getCommand();
-		        running = execute(command); 
+		        System.out.println("Enter the command of the function you wish to use: ");
+		        int numberOfOutputs = myParser.processCommand(myInput);
+		        System.out.println(numberOfOutputs);
+		        if(numberOfOutputs == -1){
+		        	for(int i=0; i<3; i++){
+						System.out.println(outputScan.nextLine());
+					}
+		        	running = false;
+		        }
+		        else{
+		        	  for(int i=0; i<numberOfOutputs; i++){
+		        		  while (!outputScan.hasNextLine()) {}
+		        		String output = outputScan.nextLine();
+		        		//System.out.println("yup!");
+						System.out.println(output);
+					}
+		        }
+		        myDisplay.update();
 		    }
 		}
 
@@ -115,13 +133,13 @@ public class ParsedConsole {
 		    System.out.println("=========================================");
 		}
 		
-		private static String getCommand(){
-		    System.out.println("Enter the command of the function you wish to use: ");
-		    String command = myInput.nextLine();
-		    return command;
-		}
+//		private static String getCommand(){
+//		    System.out.println("Enter the command of the function you wish to use: ");
+//		    String command = myInput.nextLine();
+//		    return command;
+//		}
 		
-		public static void main(String args[]) throws InterruptedException, IOException, OutOfCardsException{
+		public static void main(String args[]) throws InterruptedException, IOException{
 			//Stream to send commands to the parser
 			PipedOutputStream temp = new PipedOutputStream();
 			InputStream parserIn = new PipedInputStream(temp);
@@ -136,8 +154,6 @@ public class ParsedConsole {
 			myInput = new Scanner(System.in);
 			outputScan = new Scanner(in);
 			myDisplay = new ConsoleDisplay(myParser.myProc.getMemory());
-			Thread parser = new Thread(myParser);
-			parser.start();
 			menu();
 		}
 	

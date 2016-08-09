@@ -61,12 +61,8 @@ public class Parser implements Runnable{
 		Scanner sc = new Scanner(this.in);
 		while(sc.hasNext()){
 			try {
-				processCommand(" ", sc);
+				processCommand(sc);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			} catch (OutOfCardsException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
@@ -77,8 +73,8 @@ public class Parser implements Runnable{
 		}
 	}
 	
-	public void processCommand(String command, Scanner sc) throws IOException, OutOfCardsException, InterruptedException{
-		String token = command;
+	public int processCommand(Scanner sc) throws IOException, InterruptedException{
+		String token = sc.next();
 		switch(token){
 		case "RUN":
 			if(!atStop){
@@ -109,14 +105,13 @@ public class Parser implements Runnable{
 		    		out.println(this.atStop);
 	    		}
 	    	}
-			break;
-			//return 3;
+			return 3;
 			
 		case "RELEASE":
 			this.atStop = false;
 			out.print("RELEASE " + this.atStop);
-			//return 1;
-			break;
+			return 1;
+		
 			
 		case "STOPKEY":
 			String setting = sc.next();
@@ -130,24 +125,34 @@ public class Parser implements Runnable{
 				this.status = stopKey.DOWN;
 			}
 			out.println("STOPKEY " + setting);
-			//return 1;
-			break;
+			return 1;
+			
 			
 		case "LOAD_CARDS":
 			String deck = sc.next();
 			CRDFileReader reader = new CRDFileReader(deck);
 			myProc.cardLoad(reader.createNewDeck());	
 			out.println("LOAD_CARDS " + deck);
-			//return 1;
-			break;
+			return 1;
 			
+			
+		//FOR SOME REASON THIS ONE DOESN'T GO ALL THE WAY THROUGH WHEN DONE WITH USER INPUT?
 		case "INIT_IN":
-			myProc.initialInput();
+			try{
+				myProc.initialInput();
+				
+			}
+			catch(OutOfCardsException e){
+				System.out.println("Caught?");
+			}
 			out.println("INITIAL ");
+			System.out.println("gets here at least");
 			memOutput();
-			System.out.println("how did I do this before.....");
-			//return 2;
-			break;
+			System.out.println("But here?");
+			return 3;
+			
+		//PLEASE HELP
+			
 		case "ONE_SHOT_DIAL":
 			int shots = sc.nextInt();
 			assert((shots <=10) && (shots > 0));
@@ -156,47 +161,45 @@ public class Parser implements Runnable{
 				out.println("ONE_SHOT ");
 				memOutput();
 			}
-			//return 3*shots;
-			break;
+			return 3*shots;
+			
 		case "ONE_SHOT":
 			String direction = sc.next();
 			if (direction.equals("Down")){
 				myProc.step();
 				memOutput();
-				//return 2;
-				break;
+				return 2;
+				
 			}
 			else if(direction.equals("Up")){
 				for (int i=0; i<600; i++){
 					myProc.step();
 					memOutput();
 				}
-				//return 1200;
-				break;
+				return 1200;
+				
 			}
 			else{
 			}
 			break;
 		case "OFF":
 			myProc.resetMemory();
-			System.out.println("NO? nothing?");
 			out.println("STOP");
-			System.out.println("NO? nothing?");
 			memOutput();
 			out.close();
 			in.close();
-			//return 3;
-			break;
+			return -1;
+			
 		case "START_PUNCH":
 			myProc.turnOnPunch();
 			out.println("PUNCH_START");
-			//return 1;
-			break;
+			return 1;
+			
 		case "FULL_CLEAR":
 			myProc.resetMemory();
 			memOutput();
-			//return 3;
-			break;
+			return 3;
+			
 		case "SWITCH_OS":
 			int toggle = sc.nextInt();
 			if(osLamps.get(toggle)){
@@ -206,8 +209,8 @@ public class Parser implements Runnable{
 				this.osLamps.set(toggle);
 			}
 			outputOSLamps();
-			//return 1;
-			break;
+			return 1;
+			
 		case "SWITCH_ID":
 			int idToggle = sc.nextInt();
 			int idState = sc.nextInt();
@@ -218,43 +221,43 @@ public class Parser implements Runnable{
 				idLamps.clear(idToggle);
 			}
 			outputIDLamps();
-			//return 1;
-			break;
+			return 1;
+			
 		case "CLEAR_ID":
 			idLamps.clear();
 			outputIDLamps();
-			//return 1;
-			break;
+			return 1;
+		
 		case "CLEAR_OS":
 			osLamps.clear();
 			outputOSLamps();
-			//return 1;
-			break;
+			return 1;
+			
 		case "DELAY_LINE":
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
 		    outputDelayLineDisplay();
-			//return 2;
-		    break;
+			return 2;
+		    
 		case "CHANGE_NIS":
 			if (this.nisOn) this.nisOn = false;
 	    	else this.nisOn = true;
 			out.println("NIS_CHANGED " + this.nisOn);
-			//return 1;
-			break;
+			return 1;
+			
 		case "CHANGE_SOURCE":
 			if (this.sourceOn) this.sourceOn = false;
 	    	else this.sourceOn = true;
 			out.println("SOURCE_CHANGED " + this.sourceOn);
-			//return 1;
-			break;
+			return 1;
+			
 		case "CHANGE_DEST":
 			if (this.destOn) this.destOn = false;
 	    	else this.destOn = true;
 			out.println("DEST_CHANGED " + this.destOn);
-			//return 1;
-			break;
+			return 1;
+			
 		case "SWITCH_NIS":
 			int nis = sc.nextInt();
 	    	if(nisSwitch.get(nis)){
@@ -262,8 +265,8 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(nis);
 	    	outputISLamps();
-	    	//return 1;
-	    	break;
+	    	return 1;
+	    	
 		case "SWITCH_SOURCE":
 			int source = sc.nextInt();
 	    	if(nisSwitch.get(source)){
@@ -271,8 +274,8 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(source);
 	    	outputISLamps();
-	    	//return 1;
-	    	break;
+	    	return 1;
+	    	
 		case "SWITCH_DEST":
 			int dest = sc.nextInt();
 	    	if(nisSwitch.get(dest)){
@@ -280,21 +283,247 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(dest);
 	    	outputISLamps();
-	    	//return 1;
-	    	break;
+	    	return 1;
+	    	
 		case "EXT_TREE":
 		    if (externalTreeRaised){
 		    	this.externalTreeRaised = false;
 		    }
 		    else this.externalTreeRaised = true;
-		    //return 1;
-		    break;
+		    return 1;
+		    
 		default:
-			//return 0;
-			break;
+			return 0;
 		}
-		//out.println();
-		//return 0;
+		out.println();
+		return 0;
+	}
+	public int brocessCommand(String sc) throws IOException, InterruptedException{
+		switch(sc){
+		case "RUN":
+			if(!atStop){
+	    		if(this.status == stopKey.UP){
+	    			while(myProc.getCurrentInstruction().getGo() != 0 && !stopRequested()){
+	    				myProc.step();
+	    				//Thread.sleep(20);
+	    				out.println("STEPPED ");
+	    	    		memOutput();
+	    	    		out.println(this.atStop);
+	    			}
+	    		}
+	    		else if(this.status == stopKey.LEVEL){
+	    			myProc.step();
+	    			Thread.sleep(20);
+	    			out.println("STEPPED ");
+		    		memOutput();
+		    		out.println(this.atStop);
+	    		}
+	    		else{
+	    			myProc.step();
+	    			if (myProc.getCurrentInstruction().getGo() == 0){
+	    				this.atStop = true;
+	    			}
+	    			Thread.sleep(20);
+	    			out.println("STEPPED ");
+		    		memOutput();
+		    		out.println(this.atStop);
+	    		}
+	    	}
+			return 3;
+			
+		case "RELEASE":
+			this.atStop = false;
+			out.print("RELEASE " + this.atStop);
+			return 1;
+		
+			
+		case "STOPKEY":
+		//	String setting = sc.next();
+			//if(setting.equals("UP")){
+				this.status = stopKey.UP;
+	//		}
+	//		if(setting.equals("LEVEL")){
+				this.status = stopKey.LEVEL;
+		//	}
+		//	if(setting.equals("DOWN")){
+		//		this.status = stopKey.DOWN;
+		//	}
+	//		out.println("STOPKEY " + setting);
+			return 1;
+			
+			
+		case "LOAD_CARDS squaresProgram.txt":
+	//		String deck = sc.next();
+			CRDFileReader reader = new CRDFileReader("squaresProgram.txt");
+			myProc.cardLoad(reader.createNewDeck());	
+			out.println("LOAD_CARDS squaresProgram.txt");
+			return 1;
+			
+			
+		//FOR SOME REASON THIS ONE DOESN'T GO ALL THE WAY THROUGH WHEN DONE WITH USER INPUT?
+		case "INIT_IN":
+			try{
+				myProc.initialInput();
+				
+			}
+			catch(OutOfCardsException e){
+				System.out.println("Caught?");
+			}
+			out.println("INITIAL ");
+			System.out.println("gets here at least");
+			memOutput();
+			System.out.println("But here?");
+			return 3;
+			
+		//PLEASE HELP
+			
+//		case "ONE_SHOT_DIAL":
+//			int shots = sc.nextInt();
+//			assert((shots <=10) && (shots > 0));
+//			for (int i=0; i<shots; i++){
+//				myProc.step();
+//				out.println("ONE_SHOT ");
+//				memOutput();
+//			}
+//			return 3*shots;
+			
+//		case "ONE_SHOT":
+//			String direction = sc.next();
+//			if (direction.equals("Down")){
+//				myProc.step();
+//				memOutput();
+//				return 2;
+//				
+//			}
+//			else if(direction.equals("Up")){
+//				for (int i=0; i<600; i++){
+//					myProc.step();
+//					memOutput();
+//				}
+//				return 1200;
+//				
+//			}
+//			else{
+//			}
+//			break;
+		case "OFF":
+			myProc.resetMemory();
+			out.println("STOP");
+			memOutput();
+			out.close();
+			in.close();
+			return -1;
+			
+		case "START_PUNCH":
+			myProc.turnOnPunch();
+			out.println("PUNCH_START");
+			return 1;
+			
+		case "FULL_CLEAR":
+			myProc.resetMemory();
+			memOutput();
+			return 3;
+		default:
+			return 0;
+		}
+			
+//		case "SWITCH_OS":
+//			int toggle = sc.nextInt();
+//			if(osLamps.get(toggle)){
+//				osLamps.clear(toggle);
+//			}
+//			else{
+//				this.osLamps.set(toggle);
+//			}
+//			outputOSLamps();
+//			return 1;
+//			
+//		case "SWITCH_ID":
+//			int idToggle = sc.nextInt();
+//			int idState = sc.nextInt();
+//			if(idState == 1){
+//				idLamps.set(idToggle);
+//			}
+//			else{
+//				idLamps.clear(idToggle);
+//			}
+//			outputIDLamps();
+//			return 1;
+//			
+//		case "CLEAR_ID":
+//			idLamps.clear();
+//			outputIDLamps();
+//			return 1;
+//		
+//		case "CLEAR_OS":
+//			osLamps.clear();
+//			outputOSLamps();
+//			return 1;
+//			
+//		case "DELAY_LINE":
+//			int dl = sc.nextInt();
+//			assert((dl <= 12) && (dl > 0));
+//			this.delayLine = dl;
+//		    outputDelayLineDisplay();
+//			return 2;
+//		    
+//		case "CHANGE_NIS":
+//			if (this.nisOn) this.nisOn = false;
+//	    	else this.nisOn = true;
+//			out.println("NIS_CHANGED " + this.nisOn);
+//			return 1;
+//			
+//		case "CHANGE_SOURCE":
+//			if (this.sourceOn) this.sourceOn = false;
+//	    	else this.sourceOn = true;
+//			out.println("SOURCE_CHANGED " + this.sourceOn);
+//			return 1;
+//			
+//		case "CHANGE_DEST":
+//			if (this.destOn) this.destOn = false;
+//	    	else this.destOn = true;
+//			out.println("DEST_CHANGED " + this.destOn);
+//			return 1;
+//			
+//		case "SWITCH_NIS":
+//			int nis = sc.nextInt();
+//	    	if(nisSwitch.get(nis)){
+//	    		nisSwitch.clear(nis);
+//	    	}
+//	    	else nisSwitch.set(nis);
+//	    	outputISLamps();
+//	    	return 1;
+//	    	
+//		case "SWITCH_SOURCE":
+//			int source = sc.nextInt();
+//	    	if(nisSwitch.get(source)){
+//	    		nisSwitch.clear(source);
+//	    	}
+//	    	else nisSwitch.set(source);
+//	    	outputISLamps();
+//	    	return 1;
+//	    	
+//		case "SWITCH_DEST":
+//			int dest = sc.nextInt();
+//	    	if(nisSwitch.get(dest)){
+//	    		nisSwitch.clear(dest);
+//	    	}
+//	    	else nisSwitch.set(dest);
+//	    	outputISLamps();
+//	    	return 1;
+//	    	
+//		case "EXT_TREE":
+//		    if (externalTreeRaised){
+//		    	this.externalTreeRaised = false;
+//		    }
+//		    else this.externalTreeRaised = true;
+//		    return 1;
+//		    
+//		default:
+//			return 0;
+//		}
+		
+	
 	}
 	
 	private boolean stopRequested(){
@@ -365,7 +594,6 @@ public class Parser implements Runnable{
 		outputRegisterDisplay();
 		outputDelayLineDisplay();
 	}
-	
 	private void outputDelayLineDisplay() throws IOException{
 		StringBuilder sb = new StringBuilder();
 		sb.append(DISPLAY_DL);
