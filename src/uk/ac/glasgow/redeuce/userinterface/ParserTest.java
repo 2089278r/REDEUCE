@@ -55,7 +55,7 @@ public class ParserTest {
 			System.out.println("got a command but I don't do anything with it");
 			int expectedResponse;
 			if(userIn.equals("ONE_SHOT Up")){
-				expectedResponse = 2400;
+				expectedResponse = 1202;
 			}
 			else if(userIn.equals("INIT_IN")){
 				expectedResponse = 4;
@@ -63,7 +63,6 @@ public class ParserTest {
 			else expectedResponse = 2;
 			for(int i=0; i<expectedResponse; i++){
 				System.out.println(testScan.nextLine());
-				
 			}
 			System.out.println("what is happen?");
 			userIn = userInput.nextLine();

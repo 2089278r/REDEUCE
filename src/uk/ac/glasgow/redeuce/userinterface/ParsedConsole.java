@@ -23,53 +23,60 @@ public class ParsedConsole {
 	static InputStream in;
 	private static Parser myParser;
 	private static ConsoleDisplay myDisplay;
-	
-		
-		public static void initialise() throws IOException{
-			
-			//Stream to send commands to the parser
-			PipedOutputStream temp = new PipedOutputStream();
-			InputStream parserIn = new PipedInputStream(temp);
-			out = new PrintStream(temp);
-			
-			
-			//Stream to send responses from the parser
-			PipedOutputStream parserOut = new PipedOutputStream();
-			in = new PipedInputStream(parserOut);
-		
-			myParser = new Parser(parserIn, parserOut, new Processor());
-			myInput = new Scanner(System.in);
-			outputScan = new Scanner(in);
-			myDisplay = new ConsoleDisplay(myParser.myProc.getMemory());
-		}
-
 		
 		private static boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
-			String userIn = myInput.nextLine();
-			while(!userIn.equals("OFF")){
-				System.out.println(userIn);
-				out.println(userIn);
-				System.out.println("got a command but I don't do anything with it");
-				int expectedResponse;
-				if(userIn.equals("ONE_SHOT Up")){
-					expectedResponse = 1202;
-				}
-				else if(userIn.equals("START_PUNCH")){
-					expectedResponse = 1;
-				}
-				else if(userIn.equals("INIT_IN") || userIn.equals("RUN")){
-					expectedResponse = 4;
-				}
-				else expectedResponse = 2;
-				for(int i=0; i<=expectedResponse; i++){
+			while(!command.equals("OFF")){
+				int expectedResponse = myParser.processCommand(command, myInput);
+				//System.out.println(expectedResponse);
+//				if(command.equals("ONE_SHOT")){
+//					System.out.println("Please enter which cards you'll enter: ");
+//					String direction = myInput.nextLine();
+//					out.println("ONE_SHOT " + direction);
+//					expectedResponse = 1200;
+//				}
+//				else if(command.equals("LOAD_CARDS")){
+//					System.out.println("Please enter which cards you'll enter: ");
+//					String deck = myInput.nextLine();
+//					out.println("LOAD_CARDS " + deck);
+//					expectedResponse = 1;
+//				}
+//				else if(command.equals("ONE_SHOT_DIAL")){
+//					System.out.println("Please enter number on dial: ");
+//					int dial = myInput.nextInt();
+//					out.println("ONE_SHOT_DIAL " + dial);
+//					expectedResponse = 3*dial;
+//				}
+//				else if(command.equals("STOPKEY")){
+//					System.out.println("UP, LEVEL, or DOWN?");
+//					String setting = myInput.nextLine();
+//					out.println("STOPKEY " + setting);
+//					expectedResponse = 1;
+//				}
+//				else if(command.equals("START_PUNCH")){
+//					out.println(command);
+//					expectedResponse = 1;
+//				}
+//				else if(command.equals("INIT_IN")){
+//					out.println(command);
+//					expectedResponse = 3;
+//				}
+//				else if(command.equals("RUN")){
+//					out.println(command);
+//					expectedResponse = 3;
+//				}
+//				else {
+//					out.println(command);
+//					expectedResponse = 2;
+//				}
+//				
+				for(int i=0; i<expectedResponse; i++){
 					System.out.println(outputScan.nextLine());
-					
 				}
-				System.out.println("what is happen?");
-				userIn = myInput.nextLine();
+				
+				myDisplay.update();
+				return true;
 			}
-		    myDisplay.update();
-		    return true;
+		    return false;
 		}
 	
 		public static void menu() throws InterruptedException, IOException, OutOfCardsException{
@@ -79,8 +86,7 @@ public class ParsedConsole {
 		    {
 		        displayMenu();
 		        command = getCommand();
-		        out.println(command);
-		        running = execute(command);
+		        running = execute(command); 
 		    }
 		}
 
@@ -116,7 +122,20 @@ public class ParsedConsole {
 		}
 		
 		public static void main(String args[]) throws InterruptedException, IOException, OutOfCardsException{
-			initialise();
+			//Stream to send commands to the parser
+			PipedOutputStream temp = new PipedOutputStream();
+			InputStream parserIn = new PipedInputStream(temp);
+			out = new PrintStream(temp);
+			
+			
+			//Stream to send responses from the parser
+			PipedOutputStream parserOut = new PipedOutputStream();
+			in = new PipedInputStream(parserOut);
+		
+			myParser = new Parser(parserIn, parserOut, new Processor());
+			myInput = new Scanner(System.in);
+			outputScan = new Scanner(in);
+			myDisplay = new ConsoleDisplay(myParser.myProc.getMemory());
 			Thread parser = new Thread(myParser);
 			parser.start();
 			menu();

@@ -14,7 +14,8 @@ public abstract class CardDeck {
 	
 	public Card getNextCard() throws OutOfCardsException{
 		if (positionInDeck == cards.size()){
-			throw new OutOfCardsException("All out of cards!");
+			return null;
+			//throw new OutOfCardsException("All out of cards!");
 		}
 		else{
 			return cards.get(positionInDeck++);
