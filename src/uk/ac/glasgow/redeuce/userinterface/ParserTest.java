@@ -55,7 +55,7 @@ public class ParserTest {
 			System.out.println("got a command but I don't do anything with it");
 			int expectedResponse;
 			if(userIn.equals("ONE_SHOT Up")){
-				expectedResponse = 1202;
+				expectedResponse = 1200;
 			}
 			else if(userIn.equals("INIT_IN")){
 				expectedResponse = 4;
@@ -66,8 +66,9 @@ public class ParserTest {
 			}
 			System.out.println("what is happen?");
 			userIn = userInput.nextLine();
-			
 		}
+		testScan.close();
+		userInput.close();
 	}
 	
 	@Test
@@ -76,12 +77,14 @@ public class ParserTest {
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
 		out.println("OFF");
-		System.out.println(testScan.nextLine());
+		System.out.println("Going on...");
+		System.out.print(testScan.nextLine());
 		testScan.close();
 	}
 	
 	@Test
 	public void multipleCommandsTest() throws FileNotFoundException {
+		System.out.println("Started!");
 		Thread parser = new Thread(this.myParser);
 		parser.start();
 		Scanner testScan = new Scanner(this.in);
