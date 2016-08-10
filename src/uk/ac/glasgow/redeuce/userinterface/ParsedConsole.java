@@ -6,15 +6,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
-
-import org.junit.Before;
-
-import uk.ac.glasgow.redeuce.memory.Word;
-import uk.ac.glasgow.redeuce.peripherals.CRDFileReader;
-import uk.ac.glasgow.redeuce.peripherals.OutOfCardsException;
 import uk.ac.glasgow.redeuce.processor.Processor;
 import uk.ac.glasgow.redeuce.userinterface.console.ConsoleDisplay;
-import uk.ac.glasgow.redeuce.userinterface.console.Console.stopKey;
 
 public class ParsedConsole {
 	private static Scanner outputScan;

@@ -3,20 +3,16 @@ package uk.ac.glasgow.redeuce.userinterface;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import uk.ac.glasgow.redeuce.memory.Memory;
 import uk.ac.glasgow.redeuce.memory.Word;
 import uk.ac.glasgow.redeuce.peripherals.CRDFileReader;
 import uk.ac.glasgow.redeuce.peripherals.OutOfCardsException;
 import uk.ac.glasgow.redeuce.processor.Processor;
-import uk.ac.glasgow.redeuce.userinterface.console.Console.stopKey;
 
 public class Parser implements Runnable{
 	
@@ -39,6 +35,13 @@ public class Parser implements Runnable{
 	public static final String START_PUNCH = "START_PUNCH";
 	public static final String FULLCLEAR = "FULL_CLEAR";
 	public static final String DELAYLINE = "DELAY_LINE";
+	public static final String EXT = "EXT";
+	public static final String SWITCHNIS = "SWITCH_NIS";
+	public static final String SWITCHSOURCE = "SWITCH_SOURCE";
+	public static final String SWITCHDEST = "SWITCH_DEST";
+	public static final String CHANGESOURCE = "CHANGE_SOURCE";
+	public static final String CHANGENIS = "CHANGE_NIS";
+	public static final String CHANGEDEST = "CHANGE_DEST";
 	
 	
 	Processor myProc;
@@ -56,7 +59,10 @@ public class Parser implements Runnable{
 	private boolean nisOn;
 	private boolean sourceOn;
 	private boolean destOn;
-	private boolean externalTreeRaised;
+	public enum ext{
+		REQUEST_STOP, NORMAL, EXTTREE
+	}
+	private ext position;
 	private BitSet nisSwitch;
 	private BitSet destSwitch;
 	private BitSet sourceSwitch;
@@ -76,6 +82,7 @@ public class Parser implements Runnable{
 		this.destSwitch = new BitSet(5);
 		this.status = stopKey.UP;
 		this.numberOfOutputs = constructMap();
+		this.position = ext.NORMAL;
 		//Construct map here maybe? call constructMap
 	}
 
@@ -83,8 +90,6 @@ public class Parser implements Runnable{
 	@SuppressWarnings("rawtypes")
 	private HashMap constructMap(){
 		Map<String, Integer> map = new HashMap<>();
-		map.put(DISPLAY_DL, 1);
-		map.put(DISPLAY_REG, 1);
 		map.put(OS_LAMPS, 1);
 		map.put(ID_LAMPS, 1);
 		map.put(IS_LAMPS, 1);
@@ -100,6 +105,13 @@ public class Parser implements Runnable{
 		map.put(START_PUNCH, 1);
 		map.put(FULLCLEAR, 2);
 		map.put(DELAYLINE, 2);
+		map.put(EXT, 1);
+		map.put(SWITCHNIS, 1);
+		map.put(SWITCHSOURCE, 1);
+		map.put(SWITCHDEST, 1);
+		map.put(CHANGESOURCE, 1);
+		map.put(CHANGENIS, 1);
+		map.put(CHANGEDEST, 1);
 		
 		return (HashMap) map;
 	}
@@ -200,7 +212,6 @@ public class Parser implements Runnable{
 			break;
 			
 			
-		//FOR SOME REASON THIS ONE DOESN'T GO ALL THE WAY THROUGH WHEN DONE WITH USER INPUT?
 		case "INIT_IN":
 			try{
 				myProc.initialInput();
@@ -211,8 +222,6 @@ public class Parser implements Runnable{
 			out.println("INITIAL ");
 			memOutput();
 			break;
-			
-		//PLEASE HELP
 			
 		case "ONE_SHOT_DIAL":
 			int shots = sc.nextInt();
@@ -339,12 +348,19 @@ public class Parser implements Runnable{
 	    	outputISLamps();
 	    	break;
 	    	
-		case "EXT_TREE":
-		    if (externalTreeRaised){
-		    	this.externalTreeRaised = false;
-		    }
-		    else this.externalTreeRaised = true;
-		    break;
+		case "EXT":
+			String toPosition = sc.next();
+			if(toPosition.equals("EXTTREE")){
+				this.position = ext.EXTTREE;
+			}
+			if(toPosition.equals("NORMAL")){
+				this.position = ext.NORMAL;
+			}
+			if(toPosition.equals("REQUEST_STOP")){
+				this.position = ext.REQUEST_STOP;
+			}
+			out.println("EXT " + toPosition);
+			break;
 		    
 		default:
 			break;
@@ -352,7 +368,7 @@ public class Parser implements Runnable{
 	}
 	
 	private boolean stopRequested(){
-		if(externalTreeRaised){
+		if(position == ext.REQUEST_STOP){
 			int nisValue = new Word(nisSwitch).getAsInt();
 			int sourceValue = new Word(sourceSwitch).getAsInt();
 			int destValue = new Word(destSwitch).getAsInt();

@@ -352,9 +352,6 @@ public class Processor {
 					    clip.open(audioInputStream);
 					    System.out.println("buzz!");
 					    clip.start();
-					    //while(clip.getMicrosecondLength() != clip.getMicrosecondPosition())
-					    //{
-					   // }
 					} catch(Exception ex) {
 					    System.out.println("Error with playing sound.");
 					    ex.printStackTrace();

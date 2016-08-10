@@ -1,12 +1,9 @@
 package uk.ac.glasgow.redeuce.userinterface;
 
-import static org.junit.Assert.*;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -16,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.glasgow.redeuce.processor.Processor;
-import uk.ac.glasgow.redeuce.userinterface.console.Console;
 
 public class ParserTest {
 

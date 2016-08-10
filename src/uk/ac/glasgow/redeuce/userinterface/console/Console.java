@@ -20,15 +20,18 @@ public class Console {
 		UP, LEVEL, DOWN
 	}
 	//DISCRIM enum as well
+	public enum EXT{
+		REQUEST_STOP, NORMAL, EXTTREE
+	}
 	private stopKey status;
 	private boolean atStop;
 	private boolean nisOn;
 	private boolean sourceOn;
 	private boolean destOn;
-	private boolean externalTreeRaised; //ENUM REQUEST STOP, NORMAL, EXT TREE
 	private BitSet nisSwitch;
 	private BitSet destSwitch;
 	private BitSet sourceSwitch;
+	private EXT position;
 
 	public Console(){
 	    myScanner = new Scanner(System.in);
@@ -44,7 +47,7 @@ public class Console {
 	    sourceSwitch = new BitSet(5);
 	    destOn = false;
 	    destSwitch = new BitSet(5);
-	    externalTreeRaised = false;
+	    position = EXT.NORMAL;
 	}
 	
 	
@@ -268,16 +271,20 @@ public class Console {
 	    	else destSwitch.set(dest);
 	    	System.out.println(new Word(destSwitch).getAsInt());
 	    }
-	    else if(command.equals("EXT_TREE")){
-	    	if (externalTreeRaised){
-	    		this.externalTreeRaised = false;
+	    else if(command.equals("EXT"))
+	    {
+	    	System.out.println("set to REQUEST_STOP, NORMAL, or EXTTREE");
+	    	String setting = myScanner.nextLine();
+	    	if(setting.equals("REQUEST_STOP")){
+	    		this.position = EXT.REQUEST_STOP;
 	    	}
-	    	else this.externalTreeRaised = true;
+	    	if(setting.equals("NORMAL")){
+	    		this.position = EXT.NORMAL;
+	    	}
+	    	if(setting.equals("EXTTREE")){
+	    		this.position = EXT.EXTTREE;
+	    	}
 	    }
-	    //IMPLEMENT THE REQUEST STOP SOMEHOW, PERHAPS HAVE A WORD
-	    //AS A FIELD, AND CONSTANTLY CHECK IF EXTERNAL TREE IS RAISED
-	    //IF SO, THEN CHECK THE WORD AND FIND A WAY TO WAIT IF THE WORD
-	    //MATCHES THE SETTINGS OF THE REQUESTED STOP
 	    else{
 	    	System.out.println("Sorry! Either incorrect format or that instruction isn't implemented yet!");
 	    }
@@ -292,7 +299,7 @@ public class Console {
 	}
 	
 	private boolean stopRequested(){
-		if(externalTreeRaised){
+		if(position == EXT.REQUEST_STOP){
 			int nisValue = new Word(nisSwitch).getAsInt();
 			int sourceValue = new Word(sourceSwitch).getAsInt();
 			int destValue = new Word(destSwitch).getAsInt();
