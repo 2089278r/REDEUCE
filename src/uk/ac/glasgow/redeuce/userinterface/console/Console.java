@@ -19,12 +19,13 @@ public class Console {
 	public enum stopKey {
 		UP, LEVEL, DOWN
 	}
+	//DISCRIM enum as well
 	private stopKey status;
 	private boolean atStop;
 	private boolean nisOn;
 	private boolean sourceOn;
 	private boolean destOn;
-	private boolean externalTreeRaised;
+	private boolean externalTreeRaised; //ENUM REQUEST STOP, NORMAL, EXT TREE
 	private BitSet nisSwitch;
 	private BitSet destSwitch;
 	private BitSet sourceSwitch;

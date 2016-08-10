@@ -23,86 +23,30 @@ public class ParsedConsole {
 	static InputStream in;
 	private static Parser myParser;
 	private static ConsoleDisplay myDisplay;
-		
-//		private static boolean execute(String command) throws InterruptedException, IOException, OutOfCardsException{
-//			while(!command.equals("OFF")){
-//				int expectedResponse = myParser.processCommand(command);
-				//System.out.println(expectedResponse);
-//				if(command.equals("ONE_SHOT")){
-//					System.out.println("Please enter which cards you'll enter: ");
-//					String direction = myInput.nextLine();
-//					out.println("ONE_SHOT " + direction);
-//					expectedResponse = 1200;
-//				}
-//				else if(command.equals("LOAD_CARDS")){
-//					System.out.println("Please enter which cards you'll enter: ");
-//					String deck = myInput.nextLine();
-//					out.println("LOAD_CARDS " + deck);
-//					expectedResponse = 1;
-//				}
-//				else if(command.equals("ONE_SHOT_DIAL")){
-//					System.out.println("Please enter number on dial: ");
-//					int dial = myInput.nextInt();
-//					out.println("ONE_SHOT_DIAL " + dial);
-//					expectedResponse = 3*dial;
-//				}
-//				else if(command.equals("STOPKEY")){
-//					System.out.println("UP, LEVEL, or DOWN?");
-//					String setting = myInput.nextLine();
-//					out.println("STOPKEY " + setting);
-//					expectedResponse = 1;
-//				}
-//				else if(command.equals("START_PUNCH")){
-//					out.println(command);
-//					expectedResponse = 1;
-//				}
-//				else if(command.equals("INIT_IN")){
-//					out.println(command);
-//					expectedResponse = 3;
-//				}
-//				else if(command.equals("RUN")){
-//					out.println(command);
-//					expectedResponse = 3;
-//				}
-//				else {
-//					out.println(command);
-//					expectedResponse = 2;
-//				}
-//				
-//				for(int i=0; i<expectedResponse; i++){
-//					System.out.println(outputScan.nextLine());
-//				}
-//				
-//				myDisplay.update();
-//				return true;
-//			}
-//		    return false;
-//		}
 	
 		public static void menu() throws InterruptedException, IOException{
-		   // String command;
+			String command;
+			int numberOfOutputs;
 		    boolean running = true;
 		    Thread parser = new Thread(myParser);
 			parser.start();
 		    while(running)
-		    {
-		        displayMenu();
-		        System.out.println("Enter the command of the function you wish to use: ");
-		        int numberOfOutputs = myParser.processCommand(myInput);
-		        System.out.println(numberOfOutputs);
-		        if(numberOfOutputs == -1){
+		    { 
+		    	displayMenu();
+		    	command = getCommand();
+		    	numberOfOutputs = myParser.getNumberOfOutputs(command);
+		        out.println(command);
+		        if(!(numberOfOutputs == -1)){
+		        	for(int i=0; i<numberOfOutputs; i++){
+		        		String output = outputScan.nextLine();
+						System.out.println(output);
+		        	}
+		        }
+		        else{
 		        	for(int i=0; i<3; i++){
 						System.out.println(outputScan.nextLine());
 					}
 		        	running = false;
-		        }
-		        else{
-		        	  for(int i=0; i<numberOfOutputs; i++){
-		        		  while (!outputScan.hasNextLine()) {}
-		        		String output = outputScan.nextLine();
-		        		//System.out.println("yup!");
-						System.out.println(output);
-					}
 		        }
 		        myDisplay.update();
 		    }
@@ -124,7 +68,8 @@ public class ParsedConsole {
 		    System.out.println("|Pause when ID..............STOP_REQUEST|");
 		    System.out.println("|Clear all of memory..........FULL_CLEAR|");
 		    System.out.println("|Take 1-10 steps...........ONE_SHOT_DIAL|");
-		    System.out.println("|Press One Shot up or down......ONE_SHOT|");
+		    System.out.println("|Press One Shot up...........ONE_SHOT_UP|");
+		    System.out.println("|Press One Shot down.......ONE_SHOT_DOWN|");
 		    System.out.println("|Clear OS Lamps.................CLEAR_OS|");
 		    System.out.println("|Clear ID Lamps.................CLEAR_ID|");
 		    System.out.println("|Select a delay line..........DELAY_LINE|");
@@ -133,11 +78,11 @@ public class ParsedConsole {
 		    System.out.println("=========================================");
 		}
 		
-//		private static String getCommand(){
-//		    System.out.println("Enter the command of the function you wish to use: ");
-//		    String command = myInput.nextLine();
-//		    return command;
-//		}
+		private static String getCommand(){
+		    System.out.println("Enter the command of the function you wish to use: ");
+		    String command = myInput.nextLine();
+		    return command;
+		}
 		
 		public static void main(String args[]) throws InterruptedException, IOException{
 			//Stream to send commands to the parser

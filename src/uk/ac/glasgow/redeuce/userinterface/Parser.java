@@ -7,6 +7,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import uk.ac.glasgow.redeuce.memory.Memory;
@@ -18,11 +20,27 @@ import uk.ac.glasgow.redeuce.userinterface.console.Console.stopKey;
 
 public class Parser implements Runnable{
 	
+	//MOVE CONSTANTS TO CASE STATEMENTS and MAP
+	
 	public static final String DISPLAY_DL = "DISPLAY_DL";
 	public static final String DISPLAY_REG = "DISPLAY_REG";
 	public static final String OS_LAMPS = "OS_LAMPS";
-	public static final String ID_LAMPS = "ID_LAMPS";
+	public static final String ID_LAMPS = "SWITCH_ID";
 	public static final String IS_LAMPS = "IS_LAMPS";
+	public static final String OFF = "OFF";
+	public static final String RUN = "RUN";
+	public static final String RELEASE = "RELEASE";
+	public static final String STOPKEY = "STOPKEY";
+	public static final String LOADCARDS = "LOAD_CARDS";
+	public static final String INITIAL = "INIT_IN";
+	public static final String DIAL = "ONE_SHOT_DIAL";
+	public static final String ONESHOTUP = "ONE_SHOT_UP";
+	public static final String ONESHOTDOWN = "ONE_SHOT_DOWN";
+	public static final String START_PUNCH = "START_PUNCH";
+	public static final String FULLCLEAR = "FULL_CLEAR";
+	public static final String DELAYLINE = "DELAY_LINE";
+	
+	
 	Processor myProc;
 	private InputStream in;
 	private PrintStream out;
@@ -42,7 +60,9 @@ public class Parser implements Runnable{
 	private BitSet nisSwitch;
 	private BitSet destSwitch;
 	private BitSet sourceSwitch;
+	private HashMap<String, Integer> numberOfOutputs;
 	
+	@SuppressWarnings("unchecked") //Hashmap stuff?
 	public Parser(InputStream in, OutputStream out, Processor myProc){
 		this.in = in;
 		this.out = new PrintStream(out);
@@ -55,8 +75,52 @@ public class Parser implements Runnable{
 		this.sourceSwitch = new BitSet(5);
 		this.destSwitch = new BitSet(5);
 		this.status = stopKey.UP;
+		this.numberOfOutputs = constructMap();
+		//Construct map here maybe? call constructMap
 	}
 
+
+	@SuppressWarnings("rawtypes")
+	private HashMap constructMap(){
+		Map<String, Integer> map = new HashMap<>();
+		map.put(DISPLAY_DL, 1);
+		map.put(DISPLAY_REG, 1);
+		map.put(OS_LAMPS, 1);
+		map.put(ID_LAMPS, 1);
+		map.put(IS_LAMPS, 1);
+		map.put(OFF, -1);
+		map.put(RUN, 3);
+		map.put(RELEASE, 1);
+		map.put(STOPKEY, 1);
+		map.put(LOADCARDS, 1);
+		map.put(INITIAL, 3);
+		map.put(DIAL, 3);
+		map.put(ONESHOTDOWN, 2);
+		map.put(ONESHOTUP, 1200);
+		map.put(START_PUNCH, 1);
+		map.put(FULLCLEAR, 2);
+		map.put(DELAYLINE, 2);
+		
+		return (HashMap) map;
+	}
+
+	public boolean isValidCommand(String command){
+		return numberOfOutputs.containsKey(command);
+	}
+	
+	public int getNumberOfOutputs(String command){
+		String[] splited = command.split("\\s+");
+		String request = splited[0];
+		if(request.equals("ONE_SHOT_DIAL")){
+			System.out.println((numberOfOutputs.get(request)) * Integer.parseInt(splited[1]));
+			return (numberOfOutputs.get(request)) * Integer.parseInt(splited[1]);
+		}
+		if(isValidCommand(request)){
+			return numberOfOutputs.get(request);
+		}
+		else return 0;
+	}
+	
 	public void run(){
 		Scanner sc = new Scanner(this.in);
 		while(sc.hasNext()){
@@ -73,7 +137,7 @@ public class Parser implements Runnable{
 		}
 	}
 	
-	public int processCommand(Scanner sc) throws IOException, InterruptedException{
+	private void processCommand(Scanner sc) throws IOException, InterruptedException{
 		String token = sc.next();
 		switch(token){
 		case "RUN":
@@ -105,12 +169,12 @@ public class Parser implements Runnable{
 		    		out.println(this.atStop);
 	    		}
 	    	}
-			return 3;
+			break;
 			
 		case "RELEASE":
 			this.atStop = false;
 			out.print("RELEASE " + this.atStop);
-			return 1;
+			break;
 		
 			
 		case "STOPKEY":
@@ -125,7 +189,7 @@ public class Parser implements Runnable{
 				this.status = stopKey.DOWN;
 			}
 			out.println("STOPKEY " + setting);
-			return 1;
+			break;
 			
 			
 		case "LOAD_CARDS":
@@ -133,23 +197,20 @@ public class Parser implements Runnable{
 			CRDFileReader reader = new CRDFileReader(deck);
 			myProc.cardLoad(reader.createNewDeck());	
 			out.println("LOAD_CARDS " + deck);
-			return 1;
+			break;
 			
 			
 		//FOR SOME REASON THIS ONE DOESN'T GO ALL THE WAY THROUGH WHEN DONE WITH USER INPUT?
 		case "INIT_IN":
 			try{
 				myProc.initialInput();
-				
 			}
 			catch(OutOfCardsException e){
 				System.out.println("Caught?");
 			}
 			out.println("INITIAL ");
-			System.out.println("gets here at least");
 			memOutput();
-			System.out.println("But here?");
-			return 3;
+			break;
 			
 		//PLEASE HELP
 			
@@ -161,44 +222,37 @@ public class Parser implements Runnable{
 				out.println("ONE_SHOT ");
 				memOutput();
 			}
-			return 3*shots;
+			break;
 			
-		case "ONE_SHOT":
-			String direction = sc.next();
-			if (direction.equals("Down")){
+		case "ONE_SHOT_DOWN":
+			myProc.step();
+			memOutput();
+			break;
+				
+		case "ONE_SHOT_UP":
+			for (int i=0; i<600; i++){
 				myProc.step();
 				memOutput();
-				return 2;
-				
-			}
-			else if(direction.equals("Up")){
-				for (int i=0; i<600; i++){
-					myProc.step();
-					memOutput();
-				}
-				return 1200;
-				
-			}
-			else{
 			}
 			break;
+				
 		case "OFF":
 			myProc.resetMemory();
 			out.println("STOP");
 			memOutput();
 			out.close();
 			in.close();
-			return -1;
+			break;
 			
 		case "START_PUNCH":
 			myProc.turnOnPunch();
 			out.println("PUNCH_START");
-			return 1;
+			break;
 			
 		case "FULL_CLEAR":
 			myProc.resetMemory();
 			memOutput();
-			return 3;
+			break;
 			
 		case "SWITCH_OS":
 			int toggle = sc.nextInt();
@@ -209,7 +263,7 @@ public class Parser implements Runnable{
 				this.osLamps.set(toggle);
 			}
 			outputOSLamps();
-			return 1;
+			break;
 			
 		case "SWITCH_ID":
 			int idToggle = sc.nextInt();
@@ -221,42 +275,42 @@ public class Parser implements Runnable{
 				idLamps.clear(idToggle);
 			}
 			outputIDLamps();
-			return 1;
+			break;
 			
 		case "CLEAR_ID":
 			idLamps.clear();
 			outputIDLamps();
-			return 1;
+			break;
 		
 		case "CLEAR_OS":
 			osLamps.clear();
 			outputOSLamps();
-			return 1;
+			break;
 			
 		case "DELAY_LINE":
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
 		    outputDelayLineDisplay();
-			return 2;
+			break;
 		    
 		case "CHANGE_NIS":
 			if (this.nisOn) this.nisOn = false;
 	    	else this.nisOn = true;
 			out.println("NIS_CHANGED " + this.nisOn);
-			return 1;
+			break;
 			
 		case "CHANGE_SOURCE":
 			if (this.sourceOn) this.sourceOn = false;
 	    	else this.sourceOn = true;
 			out.println("SOURCE_CHANGED " + this.sourceOn);
-			return 1;
+			break;
 			
 		case "CHANGE_DEST":
 			if (this.destOn) this.destOn = false;
 	    	else this.destOn = true;
 			out.println("DEST_CHANGED " + this.destOn);
-			return 1;
+			break;
 			
 		case "SWITCH_NIS":
 			int nis = sc.nextInt();
@@ -265,7 +319,7 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(nis);
 	    	outputISLamps();
-	    	return 1;
+	    	break;
 	    	
 		case "SWITCH_SOURCE":
 			int source = sc.nextInt();
@@ -274,7 +328,7 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(source);
 	    	outputISLamps();
-	    	return 1;
+	    	break;
 	    	
 		case "SWITCH_DEST":
 			int dest = sc.nextInt();
@@ -283,20 +337,18 @@ public class Parser implements Runnable{
 	    	}
 	    	else nisSwitch.set(dest);
 	    	outputISLamps();
-	    	return 1;
+	    	break;
 	    	
 		case "EXT_TREE":
 		    if (externalTreeRaised){
 		    	this.externalTreeRaised = false;
 		    }
 		    else this.externalTreeRaised = true;
-		    return 1;
+		    break;
 		    
 		default:
-			return 0;
+			break;
 		}
-		out.println();
-		return 0;
 	}
 	
 	private boolean stopRequested(){
