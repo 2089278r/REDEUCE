@@ -1,5 +1,13 @@
 package uk.ac.glasgow.redeuce.memory;
 
+/*
+ * Class representing Words as they would be in the machine
+ * Provides classes to convert to Strings and Integers to allow
+ * variation in outputs and inputs, and make manipulation of them easier.
+ * For example, addition in the Processor is done by converting to Integers, 
+ * performing the operation, and then converting the word back into backwards-binary
+ */
+
 import java.util.BitSet;
 
 public class Word {

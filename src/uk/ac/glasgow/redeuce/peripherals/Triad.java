@@ -1,5 +1,12 @@
 package uk.ac.glasgow.redeuce.peripherals;
 
+/*
+ * Represents 3 cards which get read in as a group by the cardReader.
+ * Also provides a method to get the Delay line that a triad is meant to be read into, 
+ * as the first 4 lines of the first card in a Triad ought to be used to ready a Delay 
+ * Line to take in the words of the triad.
+ */
+
 import java.util.BitSet;
 
 public class Triad {
@@ -20,6 +27,7 @@ public class Triad {
 		this.positionInTriad = 0;
 	}
 	
+	//public void setCard(){
 	public int getDelayLine(){
 		Card firstCard = getCurrentCard();
 		CardLine currentLine;
@@ -42,6 +50,12 @@ public class Triad {
 		return this.delayLine;
 	}
 	
+	public void setCard(int position, Card card){
+		if(card == null){
+			return;
+		}
+		this.triad[position] = card;
+	}
 	public Card getCurrentCard(){
 		if (positionInTriad > 2){
 			return null;

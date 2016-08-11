@@ -1,5 +1,11 @@
 package uk.ac.glasgow.redeuce.userinterface;
 
+/*
+ * Class containing all of the code-words for commands, and the amount of responses that
+ * an interface ought to expect after a command has been received. Sends that amount of responses based
+ * on the inputs that the parser has been given.
+ */
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -4,8 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
+/*
+ * A class which creates an "actual" deck of cards from a file
+ * which must be written in the correct format.
+ * They are read in as strings and then converted into Bits 
+ * to make them easier to turn into Words in Memory
+ */
+
 public class CRDFileReader {
-	String filename = "";
+	private String filename;
 	
 	public CRDFileReader(String filename){
 		this.filename = filename;

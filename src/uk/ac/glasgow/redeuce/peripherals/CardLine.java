@@ -2,6 +2,10 @@ package uk.ac.glasgow.redeuce.peripherals;
 
 import java.util.BitSet;
 
+/*
+ * Represents each line of a card, used mostly to convert them to and from Words
+ */
+
 public class CardLine {
 	private BitSet bits;
 	

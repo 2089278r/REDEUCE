@@ -62,7 +62,7 @@ public class ProcessorTest {
 		
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 0);
 		Instruction testArith = new Instruction(0, 27, 25, 0, 0, 0, 0);
-		proc.currentInstruction = testArith;
+		proc.setCurrentInstruction(testArith);
 		proc.executeArithmetic(testArith);
 		assertTrue(proc.deuceMemory.getWord(13).getAsInt() == 1);
 	}
@@ -682,7 +682,7 @@ public class ProcessorTest {
 	}
 	
 	@Test
-	@Ignore public void perfectSquaresBigTest() throws InterruptedException, IOException{
+    @Ignore public void perfectSquaresBigTest() throws InterruptedException, IOException{
 		Word word1 = new Instruction(1, 27, 13, 0, 0, 0, 1).getAsWord();
 		proc.deuceMemory.setWord(1, word1);      //mc 0
 		proc.tickClock();
@@ -743,7 +743,7 @@ public class ProcessorTest {
 		proc.setCurrentInstruction(new Instruction(word1));
 		while(true){
 			proc.step();
-			if(proc.currentInstruction.getGo() == 0){
+			if(!proc.getGo()){
 				proc.step();
 				assertTrue(true);
 				System.out.println("yaaaaaay!");

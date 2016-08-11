@@ -1,5 +1,13 @@
 package uk.ac.glasgow.redeuce.userinterface;
 
+/*
+ * A basic User interface.
+ * Based on User inputs, commands are sent to be parsed, and the appropriate
+ * amount of responses are printed out based on the commands sent.
+ * If all done correctly, the prompt should show up again asking for the next
+ * instruction from the user until they say "OFF"
+ */
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
@@ -29,7 +37,7 @@ public class ParsedConsole {
 		    	command = getCommand();
 		    	numberOfOutputs = myParser.getNumberOfOutputs(command);
 		        out.println(command);
-		        if(!(numberOfOutputs == -1)){
+		        if(!(numberOfOutputs == -1)){   //-1 is the response given if the user says OFF
 		        	for(int i=0; i<numberOfOutputs; i++){
 		        		String output = outputScan.nextLine();
 						System.out.println(output);
@@ -45,6 +53,7 @@ public class ParsedConsole {
 		    }
 		}
 
+		//Some things perhaps to be added to the prompt..?
 		private static void displayMenu(){
 		    System.out.println("            REDEUCE program         ");
 		    System.out.println("=========================================");

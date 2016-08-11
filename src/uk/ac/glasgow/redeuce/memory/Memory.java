@@ -1,7 +1,16 @@
 package uk.ac.glasgow.redeuce.memory;
 
+/*
+ * Represents the whole memory of the DEUCE. 
+ * 12 32-bit delay lines
+ * 4 Single-word Registers
+ * 2 Quadruple-word Registers
+ * 3 Double-word Registers
+ * 
+ */
+
 public class Memory {
-	MemoryUnit[] linesAndStores;
+	private MemoryUnit[] linesAndStores;
 	
 	public Memory(){
 		//DL0 was actually DL8, so there is a +1 to make implementation easier later on...
@@ -67,6 +76,7 @@ public class Memory {
 		return delayStore.toString();
 	}
 	
+	//Method to set all words in the memory to 0s. Used in the CLEAR STORE function
 	public void clear(){
 		for (int i=1; i<linesAndStores.length; i++){
 			for(int j = 0; j<32; j++){

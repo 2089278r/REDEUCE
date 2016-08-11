@@ -1,5 +1,10 @@
 package uk.ac.glasgow.redeuce.userinterface.console;
 
+/*
+ * Writes to a file so that one can check that the appropriate things are being written after a program has been run.
+ * mcSlip is implemented, although it might be better if our interface is just never "out of sync".
+ */
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;

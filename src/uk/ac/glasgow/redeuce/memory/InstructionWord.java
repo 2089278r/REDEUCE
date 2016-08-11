@@ -2,6 +2,11 @@ package uk.ac.glasgow.redeuce.memory;
 
 import java.util.BitSet;
 
+/*
+ * Class providing methods to get certain parts of a word as 
+ * they are represented when the word is read as an instruction
+ */
+
 public class InstructionWord extends Word {
 	
 	public InstructionWord(BitSet binaryDigits) throws Exception{

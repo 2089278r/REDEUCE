@@ -1,5 +1,10 @@
 package uk.ac.glasgow.redeuce.userinterface.console;
 
+/*
+ * Used as a prototype text-based interface for the running of the machine.
+ * Outputs memory states as our test-program is being ran, and asks the user for input.
+ */
+
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Scanner;

@@ -24,13 +24,13 @@ import uk.ac.glasgow.redeuce.peripherals.Triad;
 
 public class Processor {
 	
-	Instruction currentInstruction;
-	DEUCECardPuncher puncher;
-	DEUCECardReader reader;
-	boolean go;
+	private Instruction currentInstruction;
+	private DEUCECardPuncher puncher;
+	private DEUCECardReader reader;
+	//boolean go;
 	Memory deuceMemory; //For testing purposes I suppose? I guess we'll have a large object later where the processor can just read memory?
-	boolean tcb;
-	boolean tca;
+	private boolean tcb; //To be implemented eventually
+	private boolean tca; //To be implemented eventually
 	
 	
 	public Processor(){
@@ -43,7 +43,7 @@ public class Processor {
 	
 	public Processor(DEUCECardReader reader, Memory deuceMemory, DEUCECardPuncher puncher) throws IOException{
 		this.reader = reader;
-		this.go = true;
+		//this.go = true;
 		this.deuceMemory = deuceMemory;
 		this.puncher = puncher;
 		puncher.turnOn(); //JUST FOR TESTING SO AS TO NOT REWRITE ALL TESTS
@@ -90,7 +90,10 @@ public class Processor {
 	}
 	
 	public boolean getGo(){
-		return this.go;
+		if(getCurrentInstruction().getGo() == 1){
+			return true;
+		}
+		return false;
 	}
 	
 	public Word analyseSource(Instruction instr){
@@ -434,7 +437,11 @@ public class Processor {
 				}
 				currentCard = reader.getTriad().getNext();
 			}
-			reader.takeInCards();
+			try{
+				reader.takeInCards();
+			} catch(OutOfCardsException e){
+				e.printStackTrace();
+			}
 			currentTriad = reader.getTriad();
 			
 			//This can be kept if we decide to not make the initial input function more 'real', or we can just have this as a set rule?

@@ -1,5 +1,9 @@
 package uk.ac.glasgow.redeuce.memory;
 
+/*
+ * Class representing TS13-16, each being single word stores
+ */
+
 public class SingleRegister extends Register {
 	private static final int size = 1;
 	

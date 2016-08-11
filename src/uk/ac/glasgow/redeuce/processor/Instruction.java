@@ -1,4 +1,10 @@
-package uk.ac.glasgow.redeuce.processor;
+package uk.ac.glasgow.redeuce.processor; 
+
+/*
+ * A representation of a word after it has been read as an instruction.
+ * Instructions can be of different types depending on the sources and destinations,
+ * making it easier for the Processor class
+ */
 
 import java.util.BitSet;
 

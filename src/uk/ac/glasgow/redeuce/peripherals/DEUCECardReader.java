@@ -1,5 +1,11 @@
 package uk.ac.glasgow.redeuce.peripherals;
 
+/*
+ * Class which represents the card reader of the machine.
+ * Given a deck, it reads through each card line-by-line,
+ * taking in 3 cards at a time, or a "triad".
+ */
+
 public class DEUCECardReader {
 	FixedCardDeck deck;
 	Triad triad;  //Something to simulate the different states the reader can be in?
@@ -23,7 +29,7 @@ public class DEUCECardReader {
 		try {
 			this.triad = new Triad(deck.getNextCard(), deck.getNextCard(), deck.getNextCard());
 			this.isEmpty=false;
-		} catch (OutOfCardsException e) {
+		} catch (IndexOutOfBoundsException e) {
 			e.printStackTrace();
 			this.isEmpty = true;
 			this.triad = null;

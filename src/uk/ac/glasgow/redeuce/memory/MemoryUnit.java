@@ -1,9 +1,14 @@
 package uk.ac.glasgow.redeuce.memory;
 
+/*
+ * An abstract store which can hold a certain amount of words
+ * Implemented as Delay Lines and Registers in the Memory class.
+ */
+
 public abstract class MemoryUnit {
-	int counter;
-	int size;
-	Word[] contents;
+	protected int counter;
+	protected int size;
+	protected Word[] contents;
 	//changes the value of the counter... Should it be here? Or perhaps processor should just have an array of all memory
 	//which it loops around, incrementing each element accordingly
 	public MemoryUnit(int size){
