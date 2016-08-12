@@ -26,9 +26,14 @@ public class Parser implements Runnable{
 	
 	public static final String DISPLAY_DL = "DISPLAY_DL";
 	public static final String DISPLAY_REG = "DISPLAY_REG";
-	public static final String OS_LAMPS = "OS_LAMPS";
-	public static final String ID_LAMPS = "SWITCH_ID";
-	public static final String IS_LAMPS = "IS_LAMPS";
+	public static final String OSLAMPS = "OS_LAMPS";
+	public static final String ISLAMPS = "IS_LAMPS";
+	public static final String IDLAMPS = "ID_LAMPS";
+	public static final String SWITCHOS = "SWITCH_OS";
+	public static final String SWITCHID = "SWITCH_ID";
+	public static final String SWITCHIS = "IS_LAMPS";
+	public static final String CLEAROS = "CLEAR_OS";
+	public static final String CLEARID = "CLEAR_ID";
 	public static final String OFF = "OFF";
 	public static final String RUN = "RUN";
 	public static final String RELEASE = "RELEASE";
@@ -96,9 +101,9 @@ public class Parser implements Runnable{
 	@SuppressWarnings("rawtypes")
 	private HashMap constructMap(){
 		Map<String, Integer> map = new HashMap<>();
-		map.put(OS_LAMPS, 1);
-		map.put(ID_LAMPS, 1);
-		map.put(IS_LAMPS, 1);
+		map.put(SWITCHOS, 1);
+		map.put(SWITCHID, 1);
+		map.put(SWITCHIS, 1);
 		map.put(OFF, -1);
 		map.put(RUN, 3);
 		map.put(RELEASE, 1);
@@ -130,7 +135,6 @@ public class Parser implements Runnable{
 		String[] splited = command.split("\\s+");
 		String request = splited[0];
 		if(request.equals("ONE_SHOT_DIAL")){
-			System.out.println((numberOfOutputs.get(request)) * Integer.parseInt(splited[1]));
 			return (numberOfOutputs.get(request)) * Integer.parseInt(splited[1]);
 		}
 		if(isValidCommand(request)){
@@ -158,7 +162,7 @@ public class Parser implements Runnable{
 	private void processCommand(Scanner sc) throws IOException, InterruptedException{
 		String token = sc.next();
 		switch(token){
-		case "RUN":
+		case RUN:
 			if(!atStop){
 	    		if(this.status == stopKey.UP){
 	    			while(myProc.getCurrentInstruction().getGo() != 0 && !stopRequested()){
@@ -189,13 +193,13 @@ public class Parser implements Runnable{
 	    	}
 			break;
 			
-		case "RELEASE":
+		case RELEASE:
 			this.atStop = false;
 			out.print("RELEASE " + this.atStop);
 			break;
 		
 			
-		case "STOPKEY":
+		case STOPKEY:
 			String setting = sc.next();
 			if(setting.equals("UP")){
 				this.status = stopKey.UP;
@@ -210,7 +214,7 @@ public class Parser implements Runnable{
 			break;
 			
 			
-		case "LOAD_CARDS":
+		case LOADCARDS:
 			String deck = sc.next();
 			CRDFileReader reader = new CRDFileReader(deck);
 			myProc.cardLoad(reader.createNewDeck());	
@@ -218,7 +222,7 @@ public class Parser implements Runnable{
 			break;
 			
 			
-		case "INIT_IN":
+		case INITIAL:
 			try{
 				myProc.initialInput();
 			}
@@ -229,7 +233,7 @@ public class Parser implements Runnable{
 			memOutput();
 			break;
 			
-		case "ONE_SHOT_DIAL":
+		case DIAL:
 			int shots = sc.nextInt();
 			assert((shots <=10) && (shots > 0));
 			for (int i=0; i<shots; i++){
@@ -239,19 +243,19 @@ public class Parser implements Runnable{
 			}
 			break;
 			
-		case "ONE_SHOT_DOWN":
+		case ONESHOTDOWN:
 			myProc.step();
 			memOutput();
 			break;
 				
-		case "ONE_SHOT_UP":
+		case ONESHOTUP:
 			for (int i=0; i<600; i++){
 				myProc.step();
 				memOutput();
 			}
 			break;
 				
-		case "OFF":
+		case OFF:
 			myProc.resetMemory();
 			out.println("STOP");
 			memOutput();
@@ -259,17 +263,17 @@ public class Parser implements Runnable{
 			in.close();
 			break;
 			
-		case "START_PUNCH":
+		case START_PUNCH:
 			myProc.turnOnPunch();
 			out.println("PUNCH_START");
 			break;
 			
-		case "FULL_CLEAR":
+		case FULLCLEAR:
 			myProc.resetMemory();
 			memOutput();
 			break;
 			
-		case "SWITCH_OS":
+		case SWITCHOS:
 			int toggle = sc.nextInt();
 			if(osLamps.get(toggle)){
 				osLamps.clear(toggle);
@@ -280,7 +284,7 @@ public class Parser implements Runnable{
 			outputOSLamps();
 			break;
 			
-		case "SWITCH_ID":
+		case SWITCHID:
 			int idToggle = sc.nextInt();
 			int idState = sc.nextInt();
 			if(idState == 1){
@@ -292,42 +296,42 @@ public class Parser implements Runnable{
 			outputIDLamps();
 			break;
 			
-		case "CLEAR_ID":
+		case CLEARID:
 			idLamps.clear();
 			outputIDLamps();
 			break;
 		
-		case "CLEAR_OS":
+		case CLEAROS:
 			osLamps.clear();
 			outputOSLamps();
 			break;
 			
-		case "DELAY_LINE":
+		case DELAYLINE:
 			int dl = sc.nextInt();
 			assert((dl <= 12) && (dl > 0));
 			this.delayLine = dl;
 		    outputDelayLineDisplay();
 			break;
 		    
-		case "CHANGE_NIS":
+		case CHANGENIS:
 			if (this.nisOn) this.nisOn = false;
 	    	else this.nisOn = true;
 			out.println("NIS_CHANGED " + this.nisOn);
 			break;
 			
-		case "CHANGE_SOURCE":
+		case CHANGESOURCE:
 			if (this.sourceOn) this.sourceOn = false;
 	    	else this.sourceOn = true;
 			out.println("SOURCE_CHANGED " + this.sourceOn);
 			break;
 			
-		case "CHANGE_DEST":
+		case CHANGEDEST:
 			if (this.destOn) this.destOn = false;
 	    	else this.destOn = true;
 			out.println("DEST_CHANGED " + this.destOn);
 			break;
 			
-		case "SWITCH_NIS":
+		case SWITCHNIS:
 			int nis = sc.nextInt();
 	    	if(nisSwitch.get(nis)){
 	    		nisSwitch.clear(nis);
@@ -336,7 +340,7 @@ public class Parser implements Runnable{
 	    	outputISLamps();
 	    	break;
 	    	
-		case "SWITCH_SOURCE":
+		case SWITCHSOURCE:
 			int source = sc.nextInt();
 	    	if(nisSwitch.get(source)){
 	    		nisSwitch.clear(source);
@@ -345,7 +349,7 @@ public class Parser implements Runnable{
 	    	outputISLamps();
 	    	break;
 	    	
-		case "SWITCH_DEST":
+		case SWITCHDEST:
 			int dest = sc.nextInt();
 	    	if(nisSwitch.get(dest)){
 	    		nisSwitch.clear(dest);
@@ -354,7 +358,7 @@ public class Parser implements Runnable{
 	    	outputISLamps();
 	    	break;
 	    	
-		case "EXT":
+		case EXT:
 			String toPosition = sc.next();
 			if(toPosition.equals("EXTTREE")){
 				this.position = ext.EXTTREE;
@@ -459,21 +463,21 @@ public class Parser implements Runnable{
 	}
 	private void outputOSLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
-		sb.append(OS_LAMPS);
+		sb.append(OSLAMPS);
 		sb.append(" ");
 		sb.append(asString(this.osLamps));
 		out.println(sb.toString());
 	}
 	private void outputIDLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
-		sb.append(ID_LAMPS);
+		sb.append(IDLAMPS);
 		sb.append(" ");
 		sb.append(asString(this.idLamps));
 		out.println(sb.toString());
 	}
 	private void outputISLamps() throws IOException{
 		StringBuilder sb = new StringBuilder();
-		sb.append(IS_LAMPS);
+		sb.append(ISLAMPS);
 		sb.append(" ");
 		sb.append(asString(this.nisSwitch));
 		sb.append(asString(this.sourceSwitch));
